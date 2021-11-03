@@ -12,23 +12,18 @@ from network import *
 
 # basic_node_action()
 # send_transaction()
+getMempool()
 ####################################
 
 node = SimpleNode(TESTNET_HOST, testnet=True, logging=True)
 node.handshake()
-node.send(MempoolMessage())
-inv = node.wait_for(InvMessage)
-print(inv)
-
-
-# inv = node.wait_for(InvMessage)
-# print(inv)
-
-
 
 
 ####################################
 
 ''' todo
-    1.
+    1. Could work on these responses.
+    receiving: sendheaders: 
+    receiving: sendcmpct: 000200000000000000
+    receiving: sendcmpct: 000100000000000000
 '''

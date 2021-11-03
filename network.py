@@ -302,15 +302,13 @@ class InvMessage:
         count = read_varint(s)
         inventory = []
 
-        for inv in range(count):
+        for _ in range(count):
             inventory.append(InventoryVector.parse(s))
 
         return cls(count, inventory)
 
     def serialize(self):
         raise NotImplementedError('Serialization not yet implemented!')
-
-
 
 
 class SimpleNode:

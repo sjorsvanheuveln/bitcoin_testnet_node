@@ -69,4 +69,9 @@ def send_transaction():
     node.handshake()
     node.send(tx_obj)
 
-  
+def getMempool():
+    node = SimpleNode(TESTNET_HOST, testnet=True, logging=True)
+    node.handshake()
+    node.send(MempoolMessage())
+    inv = node.wait_for(InvMessage)
+    print(inv)
