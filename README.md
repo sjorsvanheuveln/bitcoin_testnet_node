@@ -6,10 +6,8 @@ Setting up a testnet node to send eventually send a transaction.
 ### Receiving Testnet Coins ###
 Send yourself some testnet coins [here](https://testnet-faucet.mempool.co/).
 
-
 ### How to Use ###
 Run `main.py`.
-
 
 ### Resources ###
 - [Jimmy Song's: Programming Bitcoin PDF](https://www.programming-book.com/python-programming123uo00es0429/)
@@ -17,10 +15,12 @@ Run `main.py`.
 - [Justin Moon GitHub](https://github.com/justinmoon/)
 - [Bitcoin Wiki](https://en.bitcoin.it/wiki/Protocol_documentation#tx)
 
-
 ### Learnings ###
  - ...
 
+### To do ###
+1. Send a first transaction with Jimmy's libraries.
+2. Rewrite the scripting for me to learn.
 
 ### Check Later ###
 - Stenography: sending messages hidden in images.

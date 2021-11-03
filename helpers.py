@@ -1,5 +1,14 @@
 import hashlib
 
+''' constants '''
+SIGHASH_ALL = 1
+SIGHASH_NONE = 2
+SIGHASH_SINGLE = 3
+BASE58_ALPHABET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
+TWO_WEEKS = 60 * 60 * 24 * 14
+MAX_TARGET = 0xffff * 256**(0x1d - 3)
+
+
 '''networking'''
 def bytes_to_ip(ip):
     ip_string = ''
@@ -9,6 +18,7 @@ def bytes_to_ip(ip):
             ip_string += '.'
 
     return ip_string
+
 
 '''adress encoding/decoding'''
 def encode_base58(s):
@@ -43,15 +53,25 @@ def decode_base58(s):
           hash256(combined[:-4])[:4]))
     return combined[1:-4]
 
+
+''' hashing '''
+def hash160(s):
+    '''sha256 followed by ripemd160'''
+    return hashlib.new('ripemd160', hashlib.sha256(s).digest()).digest()
+
+def hash256(s):
+    return hashlib.sha256(hashlib.sha256(s).digest()).digest()
+
+def sha256(s):
+    return hashlib.sha256(s).digest()
+
+
 ''' stream handling '''
 def little_endian_to_int(b):
     return int.from_bytes(b, 'little')
 
 def int_to_little_endian(n, byte_length):
     return n.to_bytes(byte_length, 'little')
-
-def hash256(s):
-    return hashlib.sha256(hashlib.sha256(s).digest()).digest()
 
 def read_varint(s):
     '''read_varint reads a variable integer from a stream'''
@@ -82,6 +102,8 @@ def encode_varint(i):
     else:
         raise ValueError('integer too large: {}'.format(i))
 
+
+
 '''scripting'''
 def h160_to_p2pkh_address(h160, testnet=False):
     '''Takes a byte sequence hash160 and returns a p2pkh address string'''
@@ -101,6 +123,8 @@ def h160_to_p2sh_address(h160, testnet=False):
     else:
         prefix = b'\x05'
     return encode_base58_checksum(prefix + h160)
+
+
 
 '''blocks'''
 def bits_to_target(bits):
