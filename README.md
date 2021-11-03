@@ -1,6 +1,11 @@
 # Bitcoin Tesnet Node: Sending Transactions #
 Created by Sjors van Heuveln, 1 nov 2021.
-Setting up a testnet node to send eventually send a transaction.
+The goal is to build a full-fledged operational node.
+
+Current Features:
+1. Send Tx
+2. Get Mempool
+3. Get Blocks
 
 
 ### Receiving Testnet Coins ###
