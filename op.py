@@ -25,9 +25,7 @@ def encode_num(num):
     while abs_num:
         result.append(abs_num & 0xff)
         abs_num >>= 8
-    # if the top bit is set,
-    # for negative numbers we ensure that the top bit is set
-    # for positive numbers we ensure that the top bit is not set
+        
     if result[-1] & 0x80:
         if negative:
             result.append(0x80)

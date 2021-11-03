@@ -17,20 +17,55 @@ from examples import *
 ####################################
 
 from ecc import PrivateKey
-from helpers import SIGHASH_ALL
-from tx import *
+from network import SimpleNode
+from helpers import decode_base58, SIGHASH_ALL, little_endian_to_int
+from script import p2pkh_script, Script
+from tx import TxIn, TxOut, Tx
+from config import PASSPHRASE
 
-raw_tx = ('0100000001813f79011acb80925dfe69b3def355fe914bd1d96a3f5f71bf8303c6a989c7d1000000006b483045022100ed81ff192e75a3fd2304004dcadb746fa5e24c5031ccfcf21320b0277457c98f02207a986d955c6e0cb35d446a89d3f56100f4d7f67801c31967743a9c8e10615bed01210349fc4e631e3624a545de3f89f5d8684c7b8138bd94bdd531d2e213bf016b278afeffffff02a135ef01000000001976a914bc3b654dca7e56b04dca18f2566cdaf02e8d9ada88ac99c39800000000001976a9141c4bc762dd5423e332166702cb75f40df79fea1288ac19430600')
-stream = BytesIO(bytes.fromhex(raw_tx))
-transaction = Tx.parse(stream)
+e = little_endian_to_int(hash256(PASSPHRASE))
+p = PrivateKey(e)
+a = p.point.address(compressed=True, testnet=True)
+print('my pubkey:', a)
 
-z = transaction.sig_hash(0)
-private_key = PrivateKey(secret=8675309)
-der = private_key.sign(z).der()
-sig = der + SIGHASH_ALL.to_bytes(1, 'big')
-sec = private_key.point.sec()
-script_sig = Script([sig, sec])
-transaction.tx_ins[0].script_sig = script_sig 
-print(transaction.serialize().hex())
+prev_tx = bytes.fromhex('2a23ae7f643f3264e3ca284e17c754900461f2bb19cb16a017a24bedb699d59d')
+prev_index = 1
+tx_in = TxIn(prev_tx, prev_index)
+
+#change output
+change_amount = int(99000)
+change_h160 = p.point.hash160()
+change_script = p2pkh_script(change_h160)
+change_output = TxOut(amount=change_amount, script_pubkey=change_script)
+
+#target output
+target_amount = int(900)
+target_h160 = decode_base58('mnrVtF8DWjMu839VW3rBfgYaAfKk8983Xf')
+target_script = p2pkh_script(target_h160)
+target_output = TxOut(amount=target_amount, script_pubkey=target_script)
+tx_obj = Tx(1, [tx_in], [change_output, target_output], locktime = 0, testnet = True)
+
+
+# sign the one input in the transaction object using the private key
+tx_obj.sign_input(0, p)
+# print the transaction's serialization in hex
+print('\n', tx_obj.serialize().hex(), '\n')
+# broadcast at http://testnet.blockchain.info/pushtx
+
+node = SimpleNode(TESTNET_HOST, testnet=True, logging=True)
+node.handshake()
+node.send(tx_obj)
+feefilter = node.wait_for(FeefilterMessage)
+print('min fee:', feefilter.fee)
+
 
 ####################################
+
+''' todo
+
+    1. What is happening with above transaction??? raw is different to final serialization
+    2. How to make one myself on testnet -> book
+    3. Send it with the node.
+    4. Write a function that can find a utxo for my pubkey
+    5. Spend that UTXO.
+'''

@@ -5,6 +5,7 @@ from io import BytesIO
 from helpers import *
 from random import randint
 from block import Block
+from tx import Tx
 
 NETWORK_MAGIC = b'\xf9\xbe\xb4\xd9'
 TESTNET_NETWORK_MAGIC = b'\x0b\x11\x09\x07'
@@ -139,6 +140,7 @@ class VersionMessage:
             result += b'\x00'
         return result
 
+
 class VerAckMessage:
     command = b'verack'
 
@@ -258,6 +260,19 @@ class HeadersMessage:
                 raise RuntimeError('number of txs not 0')
         return cls(blocks)
 
+class FeefilterMessage:
+    '''Receive Feefilter'''
+    '''This is the minimum fee per sats/1kb'''
+    command = b'feefilter'
+
+    def __init__(self, fee):
+        self.fee = fee
+
+    @classmethod
+    def parse(cls, s):
+        fee = little_endian_to_int(s.read(8))
+        return cls(fee)
+
 
 class SimpleNode:
 
@@ -328,6 +343,10 @@ class SimpleNode:
                 print('Address received trigger')
             elif command == HeadersMessage.command:
                 print('Headers received trigger')
+            elif command == Tx.command:
+                print('Tx received trigger')
+            elif command == FeefilterMessage.command:
+                print('Feefilter received trigger')
 
         # return the envelope parsed as a member of the right message class
         return command_to_class[command].parse(envelope.stream())

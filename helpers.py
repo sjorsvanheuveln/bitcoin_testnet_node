@@ -8,6 +8,9 @@ BASE58_ALPHABET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
 TWO_WEEKS = 60 * 60 * 24 * 14
 MAX_TARGET = 0xffff * 256**(0x1d - 3)
 
+TESTNET_HOST = 'testnet.programmingbitcoin.com'
+TESTNET_PORT = 18333
+
 
 '''networking'''
 def bytes_to_ip(ip):
