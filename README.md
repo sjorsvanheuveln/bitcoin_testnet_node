@@ -19,8 +19,16 @@ Run `main.py`.
  - ...
 
 ### To do ###
-1. Send a first transaction with Jimmy's libraries.
+1. Get UTXOs of my pubkey.
 2. Rewrite the scripting for me to learn.
+3. Create a fake pubscript that locks a message on the testnet blockchain.
+4. Automate sending
+5. Check other networking commands.
+
+
+### Completed Tasks ###
+- Send a transaction with Jimmy's libraries.
+- Outputting txID when sending.
 
 ### Check Later ###
 - Stenography: sending messages hidden in images.

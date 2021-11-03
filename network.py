@@ -271,7 +271,46 @@ class FeefilterMessage:
     @classmethod
     def parse(cls, s):
         fee = little_endian_to_int(s.read(8))
+        print('Feefilter: minimum fee is:', fee, 'satoshis')
         return cls(fee)
+
+class MempoolMessage:
+    '''Request mempool transactions hashes'''
+    '''Response is an inv message'''
+    command = b'mempool'
+
+    def __init__(self):
+        pass
+
+    def serialize(self):
+        return b''
+
+class InvMessage:
+    '''Receive Inv'''
+    '''Inventory Vectors with data'''
+    command = b'inv'
+
+    def __init__(self, count, inventory):
+        self.count = count
+        self.inventory = inventory
+
+    def __repr__(self):
+        return '\nCount: {}\n{}'.format(self.count, self.inventory)
+
+    @classmethod
+    def parse(cls, s):
+        count = read_varint(s)
+        inventory = []
+
+        for inv in range(count):
+            inventory.append(InventoryVector.parse(s))
+
+        return cls(count, inventory)
+
+    def serialize(self):
+        raise NotImplementedError('Serialization not yet implemented!')
+
+
 
 
 class SimpleNode:
@@ -312,6 +351,9 @@ class SimpleNode:
         if self.logging:
             print('sending: {}'.format(envelope))
 
+        if message.command == b'tx':
+            print('txID:', message.id())
+
         self.socket.sendall(envelope.serialize())
 
     def read(self):
@@ -340,17 +382,23 @@ class SimpleNode:
                 # send pong
                 self.send(PongMessage(envelope.payload))
             elif command == AddressMessage.command:
-                print('Address received trigger')
+                pass
+                #print('Address received trigger')
             elif command == HeadersMessage.command:
-                print('Headers received trigger')
+                pass
+                #print('Headers received trigger')
             elif command == Tx.command:
-                print('Tx received trigger')
+                pass
+                #print('Tx received trigger')
             elif command == FeefilterMessage.command:
-                print('Feefilter received trigger')
+                pass
+                #print('Feefilter received trigger')
 
         # return the envelope parsed as a member of the right message class
         return command_to_class[command].parse(envelope.stream())
 
+
+## Other Classes ##
 class NetAddress:
     def __init__(self, time, services, ipv, port):
       self.time = time
@@ -374,4 +422,47 @@ class NetAddress:
 
     def serialize(self):
         raise NotImplementedError('Serialization not yet implemented!')
+
+class InventoryVector:
+    def __init__(self, obj_type, obj_hash):
+      self.obj_type = obj_type
+      self.obj_hash = obj_hash
+
+    def __repr__(self):
+        return '\n{}: {}'.format(self.type_lookup(), self.obj_hash)
+
+    @classmethod
+    def parse(cls, s):
+        obj_type = little_endian_to_int(s.read(4))
+        obj_hash = s.read(32)[::-1].hex()
+        
+        return cls(obj_type, obj_hash)
+
+    def serialize(self):
+        raise NotImplementedError('Serialization not yet implemented!')
+
+    def type_lookup(self):
+        if self.obj_type == 0:
+            return 'ERROR'
+        elif self.obj_type == 1:
+            return 'MSG_TX'
+        elif self.obj_type == 2:
+            return 'MSG_BLOCK'
+        elif self.obj_type == 3:
+            return 'MSG_FILTERED_BLOCK'
+        elif self.obj_type == 4:
+            return 'MSG_CMPCT_BLOCK'
+        elif self.obj_type == 0x40000001:
+            return 'MSG_WITNESS_TX'
+        elif self.obj_type == 0x40000002:
+            return 'MSG_WITNESS_BLOCK'
+        elif self.obj_type == 0x40000003:
+            return 'MSG_FILTERED_WITNESS_BLOCK'
+        else:
+            raise ValueError('Unknown InventoryVector data type')
+        
+
+
+
+
 

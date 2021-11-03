@@ -10,6 +10,7 @@ MAX_TARGET = 0xffff * 256**(0x1d - 3)
 
 TESTNET_HOST = 'testnet.programmingbitcoin.com'
 TESTNET_PORT = 18333
+RETURN_COIN_FAUCET_ADDRESS = 'mkHS9ne12qx9pS9VojpwU5xtRd4T7X7ZUt'
 
 
 '''networking'''
