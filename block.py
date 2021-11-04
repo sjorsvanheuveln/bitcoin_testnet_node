@@ -85,5 +85,8 @@ class Block:
         h256 = hash256(self.serialize())
         proof = little_endian_to_int(h256)
 
-        return proof < self.target()
+        if not proof < self.target():
+            raise ValueError('Invalid proof of work on:', b.hash())
+
+        return True
 

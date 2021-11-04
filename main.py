@@ -10,20 +10,31 @@ from examples import *
 from helpers import *
 from network import *
 
-# basic_node_action()
-# send_transaction()
-getMempool()
+#basic_node_action(TESTNET_HOST2)
+#send_transaction()
+#getMempool(TESTNET_HOST2)
+bloomfilter()
 ####################################
 
-node = SimpleNode(TESTNET_HOST, testnet=True, logging=True)
-node.handshake()
+#setup bloomfilter
 
 
-####################################
 
-''' todo
-    1. Could work on these responses.
-    receiving: sendheaders: 
-    receiving: sendcmpct: 000200000000000000
-    receiving: sendcmpct: 000100000000000000
-'''
+# for b in headers:
+#     print(b.check_pow(), b.hash().hex())
+
+
+
+# ####################################
+
+# ''' todo
+#     1. Check out services. Apparently only 1037/1036 allow mempool messages.
+# '''
+
+
+# node.send(GenericMessage(b'getaddr',b''))
+# addr = node.wait_for(AddressMessage)
+# for a in addr.addr_list:
+#     if a.services == 1037:
+#         print(a)
+

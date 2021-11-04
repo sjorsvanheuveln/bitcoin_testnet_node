@@ -7,6 +7,11 @@ from random import randint
 from block import Block
 from tx import Tx
 
+TX_DATA_TYPE = 1
+BLOCK_DATA_TYPE = 2
+FILTERED_BLOCK_DATA_TYPE = 3
+COMPACT_BLOCK_DATA_TYPE = 4
+
 NETWORK_MAGIC = b'\xf9\xbe\xb4\xd9'
 TESTNET_NETWORK_MAGIC = b'\x0b\x11\x09\x07'
 
@@ -24,6 +29,8 @@ class NetworkEnvelope:
 
     @classmethod
     def parse(cls, s, testnet=False):
+
+        #this is the point where code is halted as long there's nothing to read
         magic = s.read(4)
         if magic == b'':
             raise RuntimeError('Connection reset!')
@@ -69,7 +76,7 @@ class VersionMessage:
                  receiver_ip=b'\x00\x00\x00\x00', receiver_port=8333,
                  sender_services=0,
                  sender_ip=b'\x00\x00\x00\x00', sender_port=8333,
-                 nonce=None, user_agent=b'/programmingbitcoin:0.1/',
+                 nonce=None, user_agent=b'/bitcoingraffiti:0.1/',
                  latest_block=0, relay=False):
         self.version = version
         self.services = services
@@ -108,6 +115,8 @@ class VersionMessage:
         latest_block = little_endian_to_int(s.read(4))
         relay = True if s.read(1) == b'\x01' else False
         
+        print('Peer Version:', version, 'Services', services, bin(services))
+
         return cls(version, services, timestamp,
                  receiver_services,
                  receiver_ip, receiver_port,
@@ -220,6 +229,8 @@ class AddressMessage:
 
 class GetHeadersMessage:
     '''Request Headers'''
+    '''To request more headers, you can insert the last hash as a new startblock and repeat
+        as startblock is not included in the search'''
     command = b'getheaders'
 
     def __init__(self, version=70015, num_hashes=1, 
@@ -285,6 +296,25 @@ class MempoolMessage:
     def serialize(self):
         return b''
 
+class GetDataMessage:
+    command = b'getdata'
+
+    def __init__(self):
+        self.data = []
+
+    def add_data(self, data_type, identifier):
+        self.data.append((data_type, identifier))
+
+    def serialize(self):
+        result = encode_varint(len(self.data))
+        # loop through each tuple (data_type, identifier) in self.data
+        for data_type, identifier in self.data:
+            # data type is 4 bytes Little-Endian
+            result += int_to_little_endian(data_type, 4)
+            # identifier needs to be in Little-Endian
+            result += identifier[::-1]
+        return result
+
 class InvMessage:
     '''Receive Inv'''
     '''Inventory Vectors with data'''
@@ -310,6 +340,14 @@ class InvMessage:
     def serialize(self):
         raise NotImplementedError('Serialization not yet implemented!')
 
+class GenericMessage:
+    def __init__(self, command, payload):
+        self.command = command
+        self.payload = payload
+
+    def serialize(self):
+        return self.payload
+
 
 class SimpleNode:
 
@@ -332,15 +370,28 @@ class SimpleNode:
         Handshake is sending a version message and getting a verack back.'''
         version = VersionMessage()
         self.send(version)
-        self.wait_for(VerAckMessage)
+        self.wait_for(VerAckMessage, VersionMessage)
 
     def getAddressesFromHost(self):
         ''' Get peers from host'''
         getaddress = GetAddressMessage()
         self.send(getaddress)
-        print('retrieving addresses')
         address = self.wait_for(AddressMessage)
         print(address.addr_list)
+
+    def getHeadersFromBlock(self, sb):
+        '''gets headers from start block till current block'''
+        headers = []
+
+        while len(headers) % 2000 == 0:
+            self.send(GetHeadersMessage(start_block=sb))
+            headers += self.wait_for(HeadersMessage).blocks
+            sb = headers[-1].hash()
+
+        if (self.logging):
+            print('Headers retrieved:', len(headers))
+
+        return headers
 
     def send(self, message):
         '''Send a message to the connected node'''
@@ -368,8 +419,11 @@ class SimpleNode:
         command_to_class = {m.command: m for m in message_classes}
         # loop until the command is in the commands we want
         while command not in command_to_class.keys():
+
             # get the next network message
+            # this is also a halt on the code!!!
             envelope = self.read()
+
             # set the command to be evaluated
             command = envelope.command
             # we know how to respond to version and ping, handle that here
@@ -379,19 +433,9 @@ class SimpleNode:
             elif command == PingMessage.command:
                 # send pong
                 self.send(PongMessage(envelope.payload))
-            elif command == AddressMessage.command:
-                pass
-                #print('Address received trigger')
-            elif command == HeadersMessage.command:
-                pass
-                #print('Headers received trigger')
-            elif command == Tx.command:
-                pass
-                #print('Tx received trigger')
             elif command == FeefilterMessage.command:
                 pass
-                #print('Feefilter received trigger')
-
+                # send pong
         # return the envelope parsed as a member of the right message class
         return command_to_class[command].parse(envelope.stream())
 
@@ -459,8 +503,3 @@ class InventoryVector:
         else:
             raise ValueError('Unknown InventoryVector data type')
         
-
-
-
-
-

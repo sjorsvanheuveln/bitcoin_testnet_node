@@ -24,7 +24,17 @@ Run `main.py`.
 <br/>
 
 ### Learnings ###
- - ...
+ - 1. Probably: Mempool messages can only be sent to nodes with 1037 services.
+      * So 1037/1036 have: NODE_NETWORK_LIMITED, NODE_WITNESS and NODE_BLOOM ACTIVATED
+      * 1036 doesn't appear to return merkleblocks
+      
+      1  NODE_NETWORK  This node can be asked for full blocks instead of just headers.
+      2 NODE_GETUTXO  See BIP 0064
+      4 NODE_BLOOM  See BIP 0111
+      8 NODE_WITNESS  See BIP 0144
+      16  NODE_XTHIN  Never formally proposed (as a BIP), and discontinued. Was historically sporadically seen on the network.
+      64  NODE_COMPACT_FILTERS  See BIP 0157
+      1024  NODE_NETWORK_LIMITED  See BIP 0159
 <br/>
 
 ### To do ###
@@ -33,6 +43,7 @@ Run `main.py`.
 3. Create a fake pubscript that locks a message on the testnet blockchain.
 4. Automate sending
 5. Check other networking commands.
+6. Create a function to find nodes with 1036/1037 services.
 
 <br/>
 

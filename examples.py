@@ -5,9 +5,12 @@ from block import *
 from ecc import PrivateKey
 from script import p2pkh_script, Script
 from tx import TxIn, TxOut, Tx
-from config import PASSPHRASE
+from config import *
+from merkleblock import MerkleBlock
+from bloomfilter import *
 
-def basic_node_action():
+
+def basic_node_action(host):
     '''Do so simple stuff:
         1. handshake
         2. getaddr
@@ -17,7 +20,7 @@ def basic_node_action():
     '''
 
     '''setup node'''
-    node = SimpleNode(TESTNET_HOST, testnet=True, logging=True)
+    node = SimpleNode(host, testnet=True, logging=True)
     node.handshake()
 
     '''get addresses'''
@@ -35,7 +38,7 @@ def basic_node_action():
       if block.check_pow():
         print('ok', block.hash().hex())
 
-def send_transaction():
+def send_transaction(host):
     e = little_endian_to_int(hash256(PASSPHRASE))
     p = PrivateKey(e)
     a = p.point.address(compressed=True, testnet=True)
@@ -65,13 +68,45 @@ def send_transaction():
     # print('\n', tx_obj.serialize().hex(), '\n')
     # broadcast at http://testnet.blockchain.info/pushtx
 
-    node = SimpleNode(TESTNET_HOST, testnet=True, logging=True)
+    node = SimpleNode(host, testnet=True, logging=True)
     node.handshake()
     node.send(tx_obj)
 
-def getMempool():
-    node = SimpleNode(TESTNET_HOST, testnet=True, logging=True)
+def getMempool(host):
+    node = SimpleNode(host, testnet=True, logging=True)
     node.handshake()
     node.send(MempoolMessage())
     inv = node.wait_for(InvMessage)
     print(inv)
+
+def bloomfilter():
+    address = PUBKEY
+    h160 = decode_base58(address)
+    bf = BloomFilter(size=30, function_count=5, tweak=90210)
+    bf.add(h160)
+
+    node = SimpleNode(TESTNET_HOST3, testnet=True, logging=True)
+    node.handshake()
+    node.send(bf.filterload())
+
+    headers = node.getHeadersFromBlock(START_BLOCK)
+
+    getdata = GetDataMessage()
+    for b in headers:
+        if not b.check_pow():
+            raise RuntimeError('proof of work is invalid')
+        getdata.add_data(FILTERED_BLOCK_DATA_TYPE, b.hash())
+    node.send(getdata)
+
+    found = False
+    while not found:
+        message = node.wait_for(MerkleBlock, Tx)
+        if message.command == b'merkleblock':
+            if not message.is_valid():
+                raise RuntimeError('invalid merkle proof')
+        else:
+            for i, tx_out in enumerate(message.tx_outs):
+                if tx_out.script_pubkey.address(testnet=True) == address:
+                    print('found: {}:{}'.format(message.id(), i))
+                    found = True
+                    break

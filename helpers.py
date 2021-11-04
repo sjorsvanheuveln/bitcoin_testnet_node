@@ -9,6 +9,10 @@ TWO_WEEKS = 60 * 60 * 24 * 14
 MAX_TARGET = 0xffff * 256**(0x1d - 3)
 
 TESTNET_HOST = 'testnet.programmingbitcoin.com'
+TESTNET_HOST2 = '66.206.13.51' #functioning mempool messaging
+TESTNET_HOST3 = '60.244.109.19' #functioning mempool
+#66.206.13.51 178.63.16.7 167.99.177.70
+
 TESTNET_PORT = 18333
 RETURN_COIN_FAUCET_ADDRESS = 'mkHS9ne12qx9pS9VojpwU5xtRd4T7X7ZUt'
 
@@ -177,3 +181,110 @@ def calculate_new_bits(previous_bits, time_differential):
         new_target = MAX_TARGET
     # convert the new target to bits
     return target_to_bits(new_target)
+
+def merkle_parent(hash1, hash2):
+    '''Takes the binary hashes and calculates the hash256'''
+    # return the hash256 of hash1 + hash2
+    return hash256(hash1 + hash2)
+
+
+def merkle_parent_level(hashes):
+    '''Takes a list of binary hashes and returns a list that's half
+    the length'''
+    # if the list has exactly 1 element raise an error
+    if len(hashes) == 1:
+        raise RuntimeError('Cannot take a parent level with only 1 item')
+    # if the list has an odd number of elements, duplicate the last one
+    # and put it at the end so it has an even number of elements
+    if len(hashes) % 2 == 1:
+        hashes.append(hashes[-1])
+    # initialize next level
+    parent_level = []
+    # loop over every pair (use: for i in range(0, len(hashes), 2))
+    for i in range(0, len(hashes), 2):
+        # get the merkle parent of the hashes at index i and i+1
+        parent = merkle_parent(hashes[i], hashes[i + 1])
+        # append parent to parent level
+        parent_level.append(parent)
+    # return parent level
+    return parent_level
+
+
+def merkle_root(hashes):
+    '''Takes a list of binary hashes and returns the merkle root
+    '''
+    # current level starts as hashes
+    current_level = hashes
+    # loop until there's exactly 1 element
+    while len(current_level) > 1:
+        # current level becomes the merkle parent level
+        current_level = merkle_parent_level(current_level)
+    # return the 1st item of the current level
+    return current_level[0]
+
+
+def bit_field_to_bytes(bit_field):
+    if len(bit_field) % 8 != 0:
+        raise RuntimeError('bit_field does not have a length that is divisible by 8')
+    result = bytearray(len(bit_field) // 8)
+    for i, bit in enumerate(bit_field):
+        byte_index, bit_index = divmod(i, 8)
+        if bit:
+            result[byte_index] |= 1 << bit_index
+    return bytes(result)
+
+
+def bytes_to_bit_field(some_bytes):
+    flag_bits = []
+    # iterate over each byte of flags
+    for byte in some_bytes:
+        # iterate over each bit, right-to-left
+        for _ in range(8):
+            # add the current bit (byte & 1)
+            flag_bits.append(byte & 1)
+            # rightshift the byte 1
+            byte >>= 1
+    return flag_bits
+
+
+def murmur3(data, seed=0):
+    '''from http://stackoverflow.com/questions/13305290/is-there-a-pure-python-implementation-of-murmurhash'''
+    c1 = 0xcc9e2d51
+    c2 = 0x1b873593
+    length = len(data)
+    h1 = seed
+    roundedEnd = (length & 0xfffffffc)  # round down to 4 byte block
+    for i in range(0, roundedEnd, 4):
+        # little endian load order
+        k1 = (data[i] & 0xff) | ((data[i + 1] & 0xff) << 8) | \
+            ((data[i + 2] & 0xff) << 16) | (data[i + 3] << 24)
+        k1 *= c1
+        k1 = (k1 << 15) | ((k1 & 0xffffffff) >> 17)  # ROTL32(k1,15)
+        k1 *= c2
+        h1 ^= k1
+        h1 = (h1 << 13) | ((h1 & 0xffffffff) >> 19)  # ROTL32(h1,13)
+        h1 = h1 * 5 + 0xe6546b64
+    # tail
+    k1 = 0
+    val = length & 0x03
+    if val == 3:
+        k1 = (data[roundedEnd + 2] & 0xff) << 16
+    # fallthrough
+    if val in [2, 3]:
+        k1 |= (data[roundedEnd + 1] & 0xff) << 8
+    # fallthrough
+    if val in [1, 2, 3]:
+        k1 |= data[roundedEnd] & 0xff
+        k1 *= c1
+        k1 = (k1 << 15) | ((k1 & 0xffffffff) >> 17)  # ROTL32(k1,15)
+        k1 *= c2
+        h1 ^= k1
+    # finalization
+    h1 ^= length
+    # fmix(h1)
+    h1 ^= ((h1 & 0xffffffff) >> 16)
+    h1 *= 0x85ebca6b
+    h1 ^= ((h1 & 0xffffffff) >> 13)
+    h1 *= 0xc2b2ae35
+    h1 ^= ((h1 & 0xffffffff) >> 16)
+    return h1 & 0xffffffff
