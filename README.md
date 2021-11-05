@@ -47,7 +47,7 @@ Run `main.py`.
 <br/>
 
 ### To do ###
-0. Do Bech32 encoding to handle bloomfilter transactions.
+0. Do Bech32 encoding to handle bloomfilter transactions. (https://github.com/sipa/bech32/blob/master/ref/python/segwit_addr.py)
 1. Get UTXOs of my pubkey. -> merkleblock and bloomfilter
 2. Rewrite the scripting for me to learn.
 3. Create a fake pubscript that locks a message on the testnet blockchain.
