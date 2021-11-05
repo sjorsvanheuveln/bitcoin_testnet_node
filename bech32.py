@@ -41,7 +41,6 @@ def bech32_create_checksum(hrp, data, spec):
     polymod = bech32_polymod(values + [0, 0, 0, 0, 0, 0]) ^ const
     return [(polymod >> 5 * (5 - i)) & 31 for i in range(6)]
 
-
 def bech32_encode(hrp, data, spec):
     """Compute a Bech32 string given HRP and data values."""
     combined = data + bech32_create_checksum(hrp, data, spec)
@@ -88,7 +87,7 @@ def convertbits(data, frombits, tobits, pad=True):
     return ret
 
 
-def decode(hrp, addr):
+def segwit_decode(hrp, addr):
     """Decode a segwit address."""
     hrpgot, data, spec = bech32_decode(addr)
     if hrpgot != hrp:
@@ -105,10 +104,10 @@ def decode(hrp, addr):
     return (data[0], decoded)
 
 
-def encode(hrp, witver, witprog):
+def segwit_encode(hrp, witver, witprog):
     """Encode a segwit address."""
     spec = Encoding.BECH32 if witver == 0 else Encoding.BECH32M
     ret = bech32_encode(hrp, [witver] + convertbits(witprog, 8, 5), spec)
-    if decode(hrp, ret) == (None, None):
+    if segwit_decode(hrp, ret) == (None, None):
         return None
     return ret

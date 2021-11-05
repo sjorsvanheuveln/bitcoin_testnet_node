@@ -286,10 +286,9 @@ class Script:
             # convert to p2sh address using h160_to_p2sh_address (remember testnet)
             return h160_to_p2sh_address(h160, testnet)
         elif self.is_p2wpkh_script_pubkey():
-            raise NotImplementedError('p2wpkh_script is not implemented yet')
-            # h160 = self.cmds[1]
-            # print('segwit', h160_to_wpkh_address(h160, testnet))
-            # return h160_to_wpkh_address(h160, testnet)
+            h160 = self.cmds[1]
+            print('segwit', h160_to_wpkh_address(h160, testnet))
+            return h160_to_wpkh_address(h160, testnet)
             
 
         elif self.is_p2wsh_script_pubkey():

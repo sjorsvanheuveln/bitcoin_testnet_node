@@ -1,5 +1,5 @@
 import hashlib
-from bech32 import bech32_encode, bech32_decode
+from bech32 import segwit_encode, segwit_decode, bech32_encode, bech32_decode
 
 ''' constants '''
 SIGHASH_ALL = 1
@@ -136,13 +136,11 @@ def h160_to_p2sh_address(h160, testnet=False):
 
 
 def h160_to_wpkh_address(h160, testnet=False):
-    raise NotImplementedError('in the making')
     if testnet:
         hrp = 'tb'
     else:
         hrp = 'bc'
-    return bech32_encode(hrp, h160, spec)
-
+    return segwit_encode(hrp, 0, h160)
 
 
 '''blocks'''
