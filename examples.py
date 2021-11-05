@@ -82,7 +82,7 @@ def getMempool(host):
 def bloomfilter():
     address = PUBKEY
     h160 = decode_base58(address)
-    bf = BloomFilter(size=10, function_count=1, tweak=90210)
+    bf = BloomFilter(size=5, function_count=2, tweak=90215)
     bf.add(h160)
 
     node = SimpleNode(TESTNET_HOST3, testnet=True, logging=True)

@@ -114,7 +114,10 @@ class Script:
                 # add the op_code to the list of cmds
                 cmds.append(op_code)
         if count != length:
-            raise SyntaxError('parsing script failed')
+            #removed error to let the script keep parsing
+            print('SCRIPT INVALID: varint != length(payload)', cmds)
+            #raise SyntaxError('parsing script failed')
+
         return cls(cmds)
 
     def raw_serialize(self):
@@ -274,7 +277,6 @@ class Script:
             and type(self.cmds[1]) == bytes and len(self.cmds[1]) == 32
 
     def is_taproot_script_pubkey(self):
-        print('is taproot?', self.cmds[0] == 0x51, len(self.cmds[1]))
         return len(self.cmds) == 2 and self.cmds[0] == 0x51 \
              and type(self.cmds[1]) == bytes and len(self.cmds[1]) == 32
 
@@ -285,7 +287,7 @@ class Script:
             h160 = self.cmds[2]
             # convert to p2pkh address using h160_to_p2pkh_address (remember testnet)
             return h160_to_p2pkh_address(h160, testnet)
-            
+
         elif self.is_p2sh_script_pubkey():  # p2sh
             # hash160 is the 2nd cmd
             h160 = self.cmds[1]
@@ -309,5 +311,9 @@ class Script:
             print('\nTaproot-BECH32M:\n\n', h160_to_wpkh_address(h160, testnet, taproot))
             return h160_to_wpkh_address(h160, testnet, taproot)
 
-        raise ValueError('Unknown ScriptPubKey')
+        #deactivated valueError
+        #raise ValueError('Unknown ScriptPubKey')
+        print('Address appears to be invalid, or method not implemented!')
+        return 'Unable to decode output address'
+        
 

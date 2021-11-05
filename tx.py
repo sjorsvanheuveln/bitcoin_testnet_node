@@ -76,7 +76,6 @@ class Tx:
         self._hash_prevouts = None
         self._hash_sequence = None
         self._hash_outputs = None
-    # end::source1[]
 
     def __repr__(self):
         tx_ins = ''
@@ -97,26 +96,23 @@ class Tx:
         '''Human-readable hexadecimal of the transaction hash'''
         return self.hash().hex()
 
-    # tag::source5[]
     def hash(self):
         '''Binary hash of the legacy serialization'''
         return hash256(self.serialize_legacy())[::-1]
-    # end::source5[]
 
-    # tag::source2[]
     @classmethod
     def parse(cls, s, testnet=False):
-        s.read(4)  # <1>
-        if s.read(1) == b'\x00':  # <2>
+        s.read(4)
+        if s.read(1) == b'\x00':
             parse_method = cls.parse_segwit
         else:
             parse_method = cls.parse_legacy
-        s.seek(-5, 1)  # <3>
+        s.seek(-5, 1)
         return parse_method(s, testnet=testnet)
 
     @classmethod
     def parse_legacy(cls, s, testnet=False):
-        version = little_endian_to_int(s.read(4))   # <4>
+        version = little_endian_to_int(s.read(4))
         num_inputs = read_varint(s)
         inputs = []
         for _ in range(num_inputs):
@@ -128,9 +124,7 @@ class Tx:
         locktime = little_endian_to_int(s.read(4))
         return cls(version, inputs, outputs, locktime, 
                    testnet=testnet, segwit=False)
-    # end::source2[]
 
-    # tag::source3[]
     @classmethod
     def parse_segwit(cls, s, testnet=False):
         version = little_endian_to_int(s.read(4))
@@ -158,9 +152,7 @@ class Tx:
         locktime = little_endian_to_int(s.read(4))
         return cls(version, inputs, outputs, locktime, 
                    testnet=testnet, segwit=True)
-    # end::source3[]
 
-    # tag::source4[]
     def serialize(self):
         if self.segwit:
             return self.serialize_segwit()
@@ -196,7 +188,6 @@ class Tx:
                     result += encode_varint(len(item)) + item
         result += int_to_little_endian(self.locktime, 4)
         return result
-    # end::source4[]
 
     def fee(self):
         '''Returns the fee of this transaction in satoshi'''
@@ -431,6 +422,7 @@ class TxIn:
         # sequence is an integer in 4 bytes, little-endian
         sequence = little_endian_to_int(s.read(4))
         # return an instance of the class (see __init__ for args)
+        
         return cls(prev_tx, prev_index, script_sig, sequence)
 
     def serialize(self):
