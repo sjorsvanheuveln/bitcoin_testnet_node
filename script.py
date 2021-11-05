@@ -273,6 +273,12 @@ class Script:
         return len(self.cmds) == 2 and self.cmds[0] == 0x00 \
             and type(self.cmds[1]) == bytes and len(self.cmds[1]) == 32
 
+    def is_taproot(self):
+        print('check if taproot')
+        print(self.cmds)
+        # return len(self.cmds) == 2 and self.cmds[0] == 0x00 \
+        #     and type(self.cmds[1]) == bytes and len(self.cmds[1]) == 32
+
     def address(self, testnet=False):
         '''Returns the address corresponding to the script'''
         if self.is_p2pkh_script_pubkey():  # p2pkh
@@ -287,12 +293,16 @@ class Script:
             return h160_to_p2sh_address(h160, testnet)
         elif self.is_p2wpkh_script_pubkey():
             h160 = self.cmds[1]
-            print('segwit', h160_to_wpkh_address(h160, testnet))
+            #print('segwit', h160_to_wpkh_address(h160, testnet))
             return h160_to_wpkh_address(h160, testnet)
             
-
         elif self.is_p2wsh_script_pubkey():
-            raise NotImplementedError('p2wsh_script is not implemented yet')
+            h160 = self.cmds[1]
+            #print('\nP2WSH:\n\n', h160_to_wpkh_address(h160, testnet))
+            return h160_to_wpkh_address(h160, testnet)
+
+        elif self.is_taproot():
+            raise NotImplementedError('need taproot implementation')
 
         raise ValueError('Unknown ScriptPubKey')
 

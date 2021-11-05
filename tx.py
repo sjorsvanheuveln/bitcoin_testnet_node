@@ -61,8 +61,8 @@ class TxFetcher:
             f.write(s)
 
 
-# tag::source1[]
 class Tx:
+    '''This class is also a message to be received by the node'''
     command = b'tx'
 
     def __init__(self, version, tx_ins, tx_outs, 

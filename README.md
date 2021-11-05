@@ -44,16 +44,29 @@ Run `main.py`.
           * I think I should receive more transactions.
                -> managed to get this with a less strict bloomfilter, but getting unknown ScriptPubKey Error
 
+3. OP_RETURN: an output trick that is used to store data on the blockchain.
+     - Features: 
+          * Unspendable (burn coins)
+          * Store data (mostly ascii encoded)
+
+     - Rick Astley: https://www.blockchain.com/btc/tx/d29c9c0e8e4d2a9790922af73f0b8d51f0bd4bb19940d9cf910ead8fbe85bc9b
+     - Nelson Mandela: https://www.blockchain.com/btc/tx/8881a937a437ff6ce83be3a89d77ea88ee12315f37f7ef0dd3742c30eef92dba
+          - Seems like you signal it with 5500 satoshis.
+     - Len Sassaman: https://www.blockchain.com/btc/tx/930a2114cdaa86e1fac46d15c74e81c09eee1d4150ff9d48e76cb0697d8e1d72
+     - To solve:
+          * https://www.blockchain.com/btc-testnet/tx/535d7321491708198a9b776fb1e9765c1795ccb82e2445241e4341e3836cf363
+               - Probably part of longer message from this address:https://www.blockchain.com/btc-testnet/address/mxVFsFW5N4mu1HPkxPttorvocvzeZ7KZyk
+
+4. Play sound with: `print('\007')`
+5. Taproot = BECH32M
+
 <br/>
 
 ### To do ###
-0. Do Bech32 encoding to handle bloomfilter transactions. (https://github.com/sipa/bech32/blob/master/ref/python/segwit_addr.py)
-1. Get UTXOs of my pubkey. -> merkleblock and bloomfilter
-2. Rewrite the scripting for me to learn.
-3. Create a fake pubscript that locks a message on the testnet blockchain.
-4. Automate sending
-5. Check other networking commands.
-6. Create a function to find nodes with 1036/1037 services.
+1. Finish Bloomfilter
+     - Implement p2wsh_script
+2. Create a fake pubscript that locks a message on the testnet blockchain with OP_RETURN.
+3. Get UTXOs of my pubkey. -> merkleblock and bloomfilter
 
 <br/>
 

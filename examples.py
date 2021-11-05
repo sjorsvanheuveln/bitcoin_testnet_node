@@ -102,6 +102,7 @@ def bloomfilter():
 
     found = []
     merkle_count = 0
+    secrets = []
 
     while not found:
         message = node.wait_for(MerkleBlock, Tx)
@@ -110,9 +111,18 @@ def bloomfilter():
             if not message.is_valid():
                 raise RuntimeError('invalid merkle proof')
         else:
-            print('transaction incoming')
+            print('\nTx incoming')
             for i, tx_out in enumerate(message.tx_outs):
-                if tx_out.script_pubkey.address(testnet=True) == address:
-                    print('found: {}:{}'.format(message.id(), i))
+                print('ID:', message.id())
+
+                #OP_RETURN secrets
+                if tx_out.script_pubkey.cmds[0] == 106:    
+                    secrets.append(decode_opreturn_secret(tx_out.script_pubkey.cmds[1]))
+
+                elif tx_out.script_pubkey.address(testnet=True) == address:
+                    print('FOUND: {}:{}'.format(message.id(), i))
                     found.append(message.id())
+
     print('merkle_count:', merkle_count)
+    print('secrets', secrets)
+

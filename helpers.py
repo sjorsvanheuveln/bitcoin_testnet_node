@@ -63,6 +63,19 @@ def decode_base58(s):
           hash256(combined[:-4])[:4]))
     return combined[1:-4]
 
+def decode_opreturn_secret(data):
+    '''decode hidden messages'''
+    #beep
+
+    try:
+        secret = data.decode("ASCII")
+        print(secret, '\n')
+        print('\007')
+        return secret
+    except:
+        print('Decoding failed on:', data, '\n')
+        return None
+
 
 ''' hashing '''
 def hash160(s):
@@ -141,6 +154,15 @@ def h160_to_wpkh_address(h160, testnet=False):
     else:
         hrp = 'bc'
     return segwit_encode(hrp, 0, h160)
+
+# def h160_to_wsh_address(h160, testnet=False):
+#     raise NotImplementedError('Hi')
+#     if testnet:
+#         hrp = 'tb'
+#     else:
+#         hrp = 'bc'
+#     return segwit_encode(hrp, 0, h160)
+
 
 
 '''blocks'''
