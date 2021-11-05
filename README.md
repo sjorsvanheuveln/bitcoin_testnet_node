@@ -24,9 +24,10 @@ Run `main.py`.
 <br/>
 
 ### Learnings ###
- - 1. Probably: Mempool messages can only be sent to nodes with 1037 services.
+1. Probably: Mempool messages can only be sent to nodes with 1037 services.
       * So 1037/1036 have: NODE_NETWORK_LIMITED, NODE_WITNESS and NODE_BLOOM ACTIVATED
-      * 1036 doesn't appear to return merkleblocks
+      * 1036 doesn't appear to return merkleblocks. 
+          - And it can't as it needs to be a full node!
       
       1  NODE_NETWORK  This node can be asked for full blocks instead of just headers.
       2 NODE_GETUTXO  See BIP 0064
@@ -35,6 +36,13 @@ Run `main.py`.
       16  NODE_XTHIN  Never formally proposed (as a BIP), and discontinued. Was historically sporadically seen on the network.
       64  NODE_COMPACT_FILTERS  See BIP 0157
       1024  NODE_NETWORK_LIMITED  See BIP 0159
+
+2. FILTERED_BLOCKS return the amount of merkletrees back between your start block and the first block than contains your address.
+     - So basically I still don't know what is the significance of the bloomfilter.
+          * As I still get one transaction and the whole tree.
+          * I can imagine this works when you don't have the blockchain and want verification.
+          * I think I should receive more transactions.
+
 <br/>
 
 ### To do ###

@@ -82,14 +82,16 @@ def getMempool(host):
 def bloomfilter():
     address = PUBKEY
     h160 = decode_base58(address)
-    bf = BloomFilter(size=30, function_count=5, tweak=90210)
+    bf = BloomFilter(size=100, function_count=1, tweak=90214)
     bf.add(h160)
 
     node = SimpleNode(TESTNET_HOST3, testnet=True, logging=True)
     node.handshake()
+    node.send(GenericMessage(b'filterclear', b''))
+    time.sleep(1)
     node.send(bf.filterload())
 
-    headers = node.getHeadersFromBlock(START_BLOCK)
+    headers = node.getHeadersFromBlock(START_BLOCK2, END_BLOCK2)
 
     getdata = GetDataMessage()
     for b in headers:
@@ -98,15 +100,19 @@ def bloomfilter():
         getdata.add_data(FILTERED_BLOCK_DATA_TYPE, b.hash())
     node.send(getdata)
 
-    found = False
+    found = []
+    merkle_count = 0
+
     while not found:
         message = node.wait_for(MerkleBlock, Tx)
         if message.command == b'merkleblock':
+            merkle_count += 1
             if not message.is_valid():
                 raise RuntimeError('invalid merkle proof')
         else:
+            print('transaction incoming')
             for i, tx_out in enumerate(message.tx_outs):
                 if tx_out.script_pubkey.address(testnet=True) == address:
                     print('found: {}:{}'.format(message.id(), i))
-                    found = True
-                    break
+                    found.append(message.id())
+    print('merkle_count:', merkle_count)

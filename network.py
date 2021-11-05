@@ -143,6 +143,7 @@ class VersionMessage:
         result += self.user_agent
         result += int_to_little_endian(self.latest_block, 4)
         
+        '''relay is necessary for letting peer know to send only bloomfilter messages'''
         if self.relay:
             result += b'x\01'
         else:
@@ -379,12 +380,12 @@ class SimpleNode:
         address = self.wait_for(AddressMessage)
         print(address.addr_list)
 
-    def getHeadersFromBlock(self, sb):
+    def getHeadersFromBlock(self, sb, eb):
         '''gets headers from start block till current block'''
         headers = []
 
         while len(headers) % 2000 == 0:
-            self.send(GetHeadersMessage(start_block=sb))
+            self.send(GetHeadersMessage(start_block=sb, end_block=eb))
             headers += self.wait_for(HeadersMessage).blocks
             sb = headers[-1].hash()
 
