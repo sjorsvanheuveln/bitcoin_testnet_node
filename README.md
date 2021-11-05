@@ -42,11 +42,13 @@ Run `main.py`.
           * As I still get one transaction and the whole tree.
           * I can imagine this works when you don't have the blockchain and want verification.
           * I think I should receive more transactions.
+               -> managed to get this with a less strict bloomfilter, but getting unknown ScriptPubKey Error
 
 <br/>
 
 ### To do ###
-1. Get UTXOs of my pubkey.
+0. Do Bech32 encoding to handle bloomfilter transactions.
+1. Get UTXOs of my pubkey. -> merkleblock and bloomfilter
 2. Rewrite the scripting for me to learn.
 3. Create a fake pubscript that locks a message on the testnet blockchain.
 4. Automate sending

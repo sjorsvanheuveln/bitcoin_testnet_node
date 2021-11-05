@@ -5,6 +5,7 @@ SIGHASH_ALL = 1
 SIGHASH_NONE = 2
 SIGHASH_SINGLE = 3
 BASE58_ALPHABET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
+BECH32_ALPHABET = ''
 TWO_WEEKS = 60 * 60 * 24 * 14
 MAX_TARGET = 0xffff * 256**(0x1d - 3)
 
@@ -60,6 +61,36 @@ def decode_base58(s):
         raise ValueError('bad address: {} {}'.format(checksum, 
           hash256(combined[:-4])[:4]))
     return combined[1:-4]
+
+''' Work on This '''
+# def bech32_polymod(values):
+#     GEN = [0x3b6a57b2, 0x26508e6d, 0x1ea119fa, 0x3d4233dd, 0x2a1462b3]
+#     chk = 1
+#     for v in values:
+#         b = (chk >> 25)
+#         chk = (chk & 0x1ffffff) << 5 ^ v
+#         for i in range(5):
+#             chk ^= GEN[i] if ((b >> i) & 1) else 0
+#     return chk
+
+# def bech32_hrp_expand(s):
+#   return [ord(x) >> 5 for x in s] + [0] + [ord(x) & 31 for x in s]
+
+# def bech32_verify_checksum(hrp, data):
+#   return bech32_polymod(bech32_hrp_expand(hrp) + data) == 1
+
+# def bech32_create_checksum(hrp, data):
+#     values = bech32_hrp_expand(hrp) + data
+#     polymod = bech32_polymod(values + [0,0,0,0,0,0]) ^ 1
+#     return [(polymod >> 5 * (5 - i)) & 31 for i in range(6)]
+
+# def encode_bech32(s):
+#     raise NotImplementedError('bech32 encoding not yet implented')
+
+# def encode_bech32_checksum(s):
+#     checksum = 
+#     raise NotImplementedError('bech32checksum not yet implented')
+''' Work on This '''
 
 
 ''' hashing '''
@@ -131,6 +162,14 @@ def h160_to_p2sh_address(h160, testnet=False):
     else:
         prefix = b'\x05'
     return encode_base58_checksum(prefix + h160)
+
+'''make this'''
+def h160_to_wpkh_address(h160, testnet=False):
+    if testnet:
+        prefix = b'\x02' 
+    else:
+        prefix = b'\x03'
+    return encode_bech32_checksum(prefix + h160)
 
 
 

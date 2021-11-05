@@ -82,7 +82,7 @@ def getMempool(host):
 def bloomfilter():
     address = PUBKEY
     h160 = decode_base58(address)
-    bf = BloomFilter(size=100, function_count=1, tweak=90214)
+    bf = BloomFilter(size=10, function_count=1, tweak=90210)
     bf.add(h160)
 
     node = SimpleNode(TESTNET_HOST3, testnet=True, logging=True)
@@ -91,7 +91,7 @@ def bloomfilter():
     time.sleep(1)
     node.send(bf.filterload())
 
-    headers = node.getHeadersFromBlock(START_BLOCK2, END_BLOCK2)
+    headers = node.getHeadersFromBlock(START_BLOCK) #, END_BLOCK2
 
     getdata = GetDataMessage()
     for b in headers:

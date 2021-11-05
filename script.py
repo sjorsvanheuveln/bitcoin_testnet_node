@@ -8,6 +8,7 @@ from helpers import (
     encode_varint,
     h160_to_p2pkh_address,
     h160_to_p2sh_address,
+    h160_to_wpkh_address,
     int_to_little_endian,
     little_endian_to_int,
     read_varint,
@@ -264,17 +265,13 @@ class Script:
             and type(self.cmds[1]) == bytes and len(self.cmds[1]) == 20 \
             and self.cmds[2] == 0x87
 
-    # tag::source2[]
     def is_p2wpkh_script_pubkey(self):  # <2>
         return len(self.cmds) == 2 and self.cmds[0] == 0x00 \
             and type(self.cmds[1]) == bytes and len(self.cmds[1]) == 20
-    # end::source2[]
 
-    # tag::source5[]
     def is_p2wsh_script_pubkey(self):
         return len(self.cmds) == 2 and self.cmds[0] == 0x00 \
             and type(self.cmds[1]) == bytes and len(self.cmds[1]) == 32
-    # end::source5[]
 
     def address(self, testnet=False):
         '''Returns the address corresponding to the script'''
@@ -288,5 +285,15 @@ class Script:
             h160 = self.cmds[1]
             # convert to p2sh address using h160_to_p2sh_address (remember testnet)
             return h160_to_p2sh_address(h160, testnet)
+        elif self.is_p2wpkh_script_pubkey():
+            raise NotImplementedError('p2wpkh_script is not implemented yet')
+            # h160 = self.cmds[1]
+            # print('segwit', h160_to_wpkh_address(h160, testnet))
+            # return h160_to_wpkh_address(h160, testnet)
+            
+
+        elif self.is_p2wsh_script_pubkey():
+            raise NotImplementedError('p2wsh_script is not implemented yet')
+
         raise ValueError('Unknown ScriptPubKey')
 

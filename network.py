@@ -380,7 +380,7 @@ class SimpleNode:
         address = self.wait_for(AddressMessage)
         print(address.addr_list)
 
-    def getHeadersFromBlock(self, sb, eb):
+    def getHeadersFromBlock(self, sb, eb=None):
         '''gets headers from start block till current block'''
         headers = []
 
