@@ -59,12 +59,14 @@ Run `main.py`.
 
 4. Play sound with: `print('\007')`
 5. Taproot = BECH32M
+     - 62 chars
+     - OP_1 (81, to send to taproot address) or OP_0 (0, probably to send to for normal bech32) with 
 
 <br/>
 
 ### To do ###
 1. Finish Bloomfilter
-     - Implement p2wsh_script
+     - Implement taproot
 2. Create a fake pubscript that locks a message on the testnet blockchain with OP_RETURN.
 3. Get UTXOs of my pubkey. -> merkleblock and bloomfilter
 

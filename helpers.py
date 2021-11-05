@@ -148,12 +148,12 @@ def h160_to_p2sh_address(h160, testnet=False):
     return encode_base58_checksum(prefix + h160)
 
 
-def h160_to_wpkh_address(h160, testnet=False):
-    if testnet:
-        hrp = 'tb'
-    else:
-        hrp = 'bc'
-    return segwit_encode(hrp, 0, h160)
+def h160_to_wpkh_address(h160, testnet=False, taproot=False):
+    
+    hrp = 'tb' if testnet else 'bc'
+
+    taproot_flag = 1 if taproot else 0
+    return segwit_encode(hrp, taproot_flag, h160)
 
 # def h160_to_wsh_address(h160, testnet=False):
 #     raise NotImplementedError('Hi')

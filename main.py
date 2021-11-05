@@ -16,7 +16,10 @@ from network import *
 bloomfilter()
 ####################################
 
-
+#print(0x51)
 
 # hexdump = bytes.fromhex('81ccb4ee682bc1da3bda70176b7ccc616a6ba9da')
 # print(hexdump.decode('ascii'))
+
+# taproot = b'QhR?_q0{\x057#Q\xd4\xaf\x8b)\xa7\xa3\xc6\xe1\xc65\xf20\xf9\xa8N\x01\xdd\xa1\x15*'.hex()
+# print(len(taproot), taproot)

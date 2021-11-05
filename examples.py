@@ -113,7 +113,7 @@ def bloomfilter():
         else:
             print('\nTx incoming')
             for i, tx_out in enumerate(message.tx_outs):
-                print('ID:', message.id())
+                print('ID:', message.id(), ':', i)
 
                 #OP_RETURN secrets
                 if tx_out.script_pubkey.cmds[0] == 106:    

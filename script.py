@@ -273,11 +273,10 @@ class Script:
         return len(self.cmds) == 2 and self.cmds[0] == 0x00 \
             and type(self.cmds[1]) == bytes and len(self.cmds[1]) == 32
 
-    def is_taproot(self):
-        print('check if taproot')
-        print(self.cmds)
-        # return len(self.cmds) == 2 and self.cmds[0] == 0x00 \
-        #     and type(self.cmds[1]) == bytes and len(self.cmds[1]) == 32
+    def is_taproot_script_pubkey(self):
+        print('is taproot?', self.cmds[0] == 0x51, len(self.cmds[1]))
+        return len(self.cmds) == 2 and self.cmds[0] == 0x51 \
+             and type(self.cmds[1]) == bytes and len(self.cmds[1]) == 32
 
     def address(self, testnet=False):
         '''Returns the address corresponding to the script'''
@@ -286,11 +285,13 @@ class Script:
             h160 = self.cmds[2]
             # convert to p2pkh address using h160_to_p2pkh_address (remember testnet)
             return h160_to_p2pkh_address(h160, testnet)
+            
         elif self.is_p2sh_script_pubkey():  # p2sh
             # hash160 is the 2nd cmd
             h160 = self.cmds[1]
             # convert to p2sh address using h160_to_p2sh_address (remember testnet)
             return h160_to_p2sh_address(h160, testnet)
+
         elif self.is_p2wpkh_script_pubkey():
             h160 = self.cmds[1]
             #print('segwit', h160_to_wpkh_address(h160, testnet))
@@ -298,11 +299,15 @@ class Script:
             
         elif self.is_p2wsh_script_pubkey():
             h160 = self.cmds[1]
-            #print('\nP2WSH:\n\n', h160_to_wpkh_address(h160, testnet))
+            taproot = False
+            print('\nP2WSH:\n\n', h160_to_wpkh_address(h160, testnet))
             return h160_to_wpkh_address(h160, testnet)
 
-        elif self.is_taproot():
-            raise NotImplementedError('need taproot implementation')
+        elif self.is_taproot_script_pubkey():
+            h160 = self.cmds[1]
+            taproot = True
+            print('\nTaproot-BECH32M:\n\n', h160_to_wpkh_address(h160, testnet, taproot))
+            return h160_to_wpkh_address(h160, testnet, taproot)
 
         raise ValueError('Unknown ScriptPubKey')
 
