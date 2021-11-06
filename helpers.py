@@ -11,7 +11,7 @@ TWO_WEEKS = 60 * 60 * 24 * 14
 MAX_TARGET = 0xffff * 256**(0x1d - 3)
 
 TESTNET_HOST = 'testnet.programmingbitcoin.com'
-TESTNET_HOST2 = '66.206.13.51' #functioning mempool messaging
+TESTNET_HOST2 = '66.206.13.51' #functioning mempool messaging and handling transactions
 TESTNET_HOST3 = '60.244.109.19' #functioning mempool
 #66.206.13.51 178.63.16.7 167.99.177.70
 

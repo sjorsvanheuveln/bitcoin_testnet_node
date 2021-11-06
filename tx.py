@@ -58,13 +58,15 @@ class TxFetcher:
         except ValueError:
             raise ValueError('unexpected response: {}'.format(response.text))
 
-        amounts = [x['value'] for x in raw]
-        max_amount_index = amounts.index(max(amounts))
+        amounts = [tx['value'] for tx in raw]
+        max_index = amounts.index(max(amounts))
 
-        prev_tx = bytes.fromhex(raw[max_amount_index]['txid'])
-        prev_index = raw[max_amount_index]['vout']
+        prev_tx = bytes.fromhex(raw[max_index]['txid'])
+        prev_index = raw[max_index]['vout']
 
-        cls.cache[address] = TxIn(prev_tx, prev_index)
+        tx_in = TxIn(prev_tx, prev_index)
+        tx_in.amount = amounts[max_index]
+        cls.cache[address] = tx_in
 
         return cls.cache[address]
 
@@ -422,6 +424,7 @@ class TxIn:
         else:
             self.script_sig = script_sig
         self.sequence = sequence
+        self.amount = None #added this for utxo fetch
 
     def __repr__(self):
         return '{}:{}'.format(
