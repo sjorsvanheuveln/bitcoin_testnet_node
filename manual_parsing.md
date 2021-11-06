@@ -1,0 +1,106 @@
+
+
+
+
+
+
+
+------------------------------------------------------------
+BAD TX 
+------------------------------------------------------------
+01000000010000000000000000000000000000000000000000000000000000000000000000ffffffff1d03e50b20045bee726100a0000031010000000a4d696e696e67636f726500000000020000000000000000266a24aa21a9edc003b4a02fa3d44cabbd38d51c7ac73ccf8b6222e1d9993e1d296982f550bf33384a4c00000000001976a914638b34ce24a0cdce5682032fb7edd0402b667dbb88ac00000000
+
+Version: 01000000 [4b LE]
+input_counter: 01 [varint]
+prev_tx: 0000000000000000000000000000000000000000000000000000000000000000 [32b LE]
+tx_out_index: ffffffff [4b]
+script length: 1d [varint, 0x1d = 30 bytes = 60 hex digits]
+=======
+input_script: 03e50b20045bee726100a0000031010000000a4d696e696e67636f726500000000020000000000000000266a24aa21a9edc003b4a02fa3d44cabbd38d51c
+
+==============
+sequence: 7ac73ccf []
+8b6222e1d9993e1d296982f550bf33384a4c00000000001976a914638b34ce24a0cdce5682032fb7edd0402b667dbb88ac00000000
+
+
+
+------------------------------------------------------------
+Hmmm TX  (script length 0)
+------------------------------------------------------------
+Raw: 0200000001eff530047039616aaccb7bb826cb933ddaa2211f1616a97868fc818c79c390520100000000feffffff02a0860100000000001600146743789a1fe2a43acce8c7ea7667f1f7cb2dc8bae9112b00000000001600144898562b9641b4610d400a17cb638301ffab8761c70b2000
+Version:02000000
+Input_Counter: 01
+PrevTX: eff530047039616aaccb7bb826cb933ddaa2211f1616a97868fc818c79c39052 [32b LE, note this is not the tx hash]
+Tx_out_index: 01000000
+00feffffff02a0860100000000001600146743789a1fe2a43acce8c7ea7667f1f7cb2dc8bae9112b00000000001600144898562b9641b4610d400a17cb638301ffab8761c70b2000
+
+
+
+
+------------------------------------------------------------
+Good TX  (script length 0)
+https://www.blockchain.com/btc-testnet/tx/9c32376fefe24fbd7dd54c5fe37bd0e2292cbcf813deeedeaa0aa183f3bfb2df
+------------------------------------------------------------
+Raw: 010000000101dcd6e4b65fd8147f8404dfa50c8ce4dd0de1390e750cb49def8ca93ab87f99000000006a47304402203cd6c927269da76c688b4d14df0579228b45aa7b81238e0369e12290d85582690220541ebb87fc9c24836a5b916edf4c489b58b9ee556a659fdf475baacd5453b7490121038707dbb5b851f7952e4451ee38859601d3937d0c9260cc3d376f145d425ebea9ffffffff02b6660e00000000001976a914f06a4b0207442aa898a8a23869cf96d9d6b1594788ac9b948300000000001976a914108250f94af87aabc9a3902811a2114166ce6a3588ac00000000
+Version: 01000000
+InputCounter: 01
+prevtx: 01dcd6e4b65fd8147f8404dfa50c8ce4dd0de1390e750cb49def8ca93ab87f99 -> https://www.blockchain.com/btc-testnet/tx/997fb83aa98cef9db40c750e39e10ddde48c0ca5df04847f14d85fb6e4d6dc01
+prev_index: 00000000
+script length: 6a (106b -> 212 hex) -> 104b + 1b varint + 1b varint
+scriptSig: 47304402203cd6c927269da76c688b4d14df0579228b45aa7b81238e0369e12290d85582690220541ebb87fc9c24836a5b916edf4c489b58b9ee556a659fdf475baacd5453b7490121038707dbb5b851f7952e4451ee38859601d3937d0c9260cc3d376f145d425ebea
+  - length script: 47 -> 71 bytes = 142hex
+  - sig:  304402203cd6c927269da76c688b4d14df0579228b45aa7b81238e0369e12290d85582690220541ebb87fc9c24836a5b916edf4c489b58b9ee556a659fdf475baacd5453b74901
+  - lenpubkey: 21 -> 33b
+  - pubkey: 038707dbb5b851f7952e4451ee38859601d3937d0c9260cc3d376f145d425ebea9
+
+Check the bitcoin address from the input:
+- hash160(pubkey)= f27a523f5b241f5c76343d20a97fff12c8adb764
+- extended = 00f27a523f5b241f5c76343d20a97fff12c8adb764
+- sha256(extended)[first 4 bytes] = d1ee9f80
+- base58enconde()
+
+
+secquence: 9fffffff
+
+=====================================
+output:
+n.outputs: 02
+amount: b6660e0000000000 [943798 Satoshis]
+length: 19 [25b, 50hex]
+76: OP_DUP
+a9: OP_HASH160
+length: 14 [20b]
+pubkey: f06a4b0207442aa898a8a23869cf96d9d6b15947
+88:EQUALVERIFY
+ac: OP_CHECKSIG
+
+AMOUNT: 9b94830000000000 [8623259 Satoshis]
+LENGTH:19
+76
+a9
+14
+PUBKEY:108250f94af87aabc9a3902811a2114166ce6a35
+88
+ac
+TIMELOCK:00000000
+
+FINAL STACK:
+304402203cd6c927269da76c688b4d14df0579228b45aa7b81238e0369e12290d85582690220541ebb87fc9c24836a5b916edf4c489b58b9ee556a659fdf475baacd5453b74901
+038707dbb5b851f7952e4451ee38859601d3937d0c9260cc3d376f145d425ebea9
+OP_DUP
+OP_HASH160
+f06a4b0207442aa898a8a23869cf96d9d6b15947
+OP_EQUALVERIFY
+OP_CHECKSIG
+
+
+
+
+======================================================================
+Lookup Table
+======================================================================
+4b  = 00000000
+8b  = 0000000000000000
+16b = 00000000000000000000000000000000
+32b = 0000000000000000000000000000000000000000000000000000000000000000
+======================================================================

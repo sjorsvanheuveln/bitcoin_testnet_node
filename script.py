@@ -88,6 +88,7 @@ class Script:
             current = s.read(1)
             # increment the bytes we've read
             count += 1
+            
             # convert the current byte to an integer
             current_byte = current[0]
             # if the current byte is between 1 and 75 inclusive
@@ -115,8 +116,7 @@ class Script:
                 cmds.append(op_code)
         if count != length:
             #removed error to let the script keep parsing
-            print('SCRIPT INVALID: varint != length(payload)', cmds)
-            #raise SyntaxError('parsing script failed')
+            raise SyntaxError('parsing script failed')
 
         return cls(cmds)
 

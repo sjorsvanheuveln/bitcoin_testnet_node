@@ -4,7 +4,7 @@ from network import *
 from block import *
 from ecc import PrivateKey
 from script import p2pkh_script, Script
-from tx import TxIn, TxOut, Tx
+from tx import TxIn, TxOut, Tx, TxFetcher
 from config import *
 from merkleblock import MerkleBlock
 from bloomfilter import *
@@ -61,7 +61,6 @@ def send_transaction(host):
     target_output = TxOut(amount=target_amount, script_pubkey=target_script)
     tx_obj = Tx(1, [tx_in], [change_output, target_output], locktime = 0, testnet = True)
 
-
     # sign the one input in the transaction object using the private key
     tx_obj.sign_input(0, p)
     # print the transaction's serialization in hex
@@ -104,7 +103,7 @@ def bloomfilter():
     merkle_count = 0
     secrets = []
 
-    while not found:
+    while len(found) < 3:
         message = node.wait_for(MerkleBlock, Tx)
         if message.command == b'merkleblock':
             merkle_count += 1
@@ -126,3 +125,39 @@ def bloomfilter():
     print('merkle_count:', merkle_count)
     print('secrets', secrets)
 
+
+def len_sassaman_pretty():
+    len_sassamen_tx = '930a2114cdaa86e1fac46d15c74e81c09eee1d4150ff9d48e76cb0697d8e1d72'
+    tx = TxFetcher.fetch(len_sassamen_tx)
+
+    outs = tx.tx_outs
+    #make 58 an empty line and pad it to the third comlumn
+    outs[58].script_pubkey.cmds[2] = b'\x00'
+    outs.append(outs[58])
+    outs.append(outs[58])
+    outs.pop(58)
+    outs.pop(0)
+    
+    padding = 3
+
+    print(padding * '\n')
+    for i in range(0, int(len(outs) / 3)):
+        line = padding * '   '
+
+        for j in range(3):
+            line += outs[i + j*26].script_pubkey.cmds[2].decode('utf-8') + ' '
+
+        print(line)
+
+    print(padding * '\n')
+
+def len_sassaman():
+    len_sassamen_tx = '930a2114cdaa86e1fac46d15c74e81c09eee1d4150ff9d48e76cb0697d8e1d72'
+    tx = TxFetcher.fetch(len_sassamen_tx)
+    outs = tx.tx_outs
+
+    outs.pop(58)
+    outs.pop(0)
+
+    for out in outs:
+        print(out.script_pubkey.cmds[2].decode('utf-8'))

@@ -2,26 +2,41 @@
 Created by Sjors van Heuveln, 1 nov 2021.
 The goal is to build a full-fledged operational node.
 
-Current Features:
-1. Send Tx
-2. Get Mempool
-3. Get Blocks
-<br/>
-
-### Receiving Testnet Coins ###
-Send yourself some testnet coins [here](https://testnet-faucet.mempool.co/).
-<br/>
+*Anyone can understand Bitcoin as it's not really changing.
+Therefore mentally you can catch up with it.*
 
 ### How to Use ###
 Run `main.py`.
-<br/>
+
+
+### OPEN QUESTIONS ###
+1. How does the send transaction work.
+     * node.send() -> creates Network Envelope [reqs: command & message.serialize()]
+     * Tx.serialize() -> Tx_in.serialize + Tx_out.serialize()
+2. What is ASM in display sigscript?
+
+
+### To do ###
+
+1. Create a fake pubscript that locks a message on the testnet blockchain with OP_RETURN.
+2. Fix Bad TX filter
+     - Parse the transaction manually, see where it goes wrong.
+     - I think somehow I'm fishing out the hacks I think, my script mostly works fine.
+3. Get UTXOs of my pubkey. -> merkleblock and bloomfilter
+     - And automate the transaction.
+4. Decode a hidden message -> Len Sassaman -> TxFetch
+
 
 ### Resources ###
 - [Jimmy Song's: Programming Bitcoin PDF](https://www.programming-book.com/python-programming123uo00es0429/)
 - [Justmin Moon YouTube](https://www.youtube.com/watch?v=gMmWhiDSius&ab_channel=JustinMoon)
 - [Justin Moon GitHub](https://github.com/justinmoon/)
 - [Bitcoin Wiki](https://en.bitcoin.it/wiki/Protocol_documentation#tx)
-<br/>
+
+
+### Tools ###
+- Get Testnet coins [here](https://testnet-faucet.mempool.co/).
+
 
 ### Learnings ###
 1. Probably: Mempool messages can only be sent to nodes with 1037 services.
@@ -29,7 +44,7 @@ Run `main.py`.
       * 1036 doesn't appear to return merkleblocks. 
           - And it can't as it needs to be a full node!
       
-      1  NODE_NETWORK  This node can be asked for full blocks instead of just headers.
+      1 NODE_NETWORK  This node can be asked for full blocks instead of just headers.
       2 NODE_GETUTXO  See BIP 0064
       4 NODE_BLOOM  See BIP 0111
       8 NODE_WITNESS  See BIP 0144
@@ -58,25 +73,36 @@ Run `main.py`.
                - Probably part of longer message from this address:https://www.blockchain.com/btc-testnet/address/mxVFsFW5N4mu1HPkxPttorvocvzeZ7KZyk
 
 4. Play sound with: `print('\007')`
-5. Taproot = BECH32M
+
+5. Taproot = BECH32M (or at least a wrap around)
      - 62 chars
-     - OP_1 (81, to send to taproot address) or OP_0 (0, probably to send to for normal bech32) with 
+     - OP_1 (81, to send to taproot address) or OP_0 (0, probably to send to for normal bech32) with
 
-<br/>
+6. Reading Blockchain.com
+     - It removes varints at e.g. Sigscript
+     - It delineates signature and pubkey in the inputs.
+     - Provides the necessary material to verify.
 
-### To do ###
-1. Finish Bloomfilter
-     - Implement taproot
-2. Create a fake pubscript that locks a message on the testnet blockchain with OP_RETURN.
-3. Get UTXOs of my pubkey. -> merkleblock and bloomfilter
+7. From Hex to Bytes:
+     - The way: bytes.fromhex(hexstring)
+     - b'' is not good!
 
-<br/>
+8. Signing transactions:
+     - You sign the hash256 of all the transaction data serialized (without the sighash itself)
+          * This protects the data for tampering by other nodes.
+          * Sighash is signed with privatekey
+          * Though the verification process is easy for all nodes.
+     - Basically you are proving:
+          * You have the public key that generates the address [OP_EQUALVERIFY]
+          * Sighash and public key prove you own the privatekey. [OP_CHECKSIG]
+          * In short: That you may spend the UTXO.
+     - Outputs don't care for a transaction verificaiton
+          * You can write the most horrible outputs (I think)
+          * As long as the Script reduces to True.
+     - Coinbase Transaction:
+          * Coinbase + fees are (can be) in 1 output.
+          * Blockheight is also somewhere in there I believe.
 
-### Completed Tasks ###
-- Send a transaction with Jimmy's libraries.
-- Outputting txID when sending.
-<br/>
 
 ### Check Later ###
 - Stenography: sending messages hidden in images.
-<br/>

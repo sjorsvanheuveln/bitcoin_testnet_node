@@ -70,7 +70,6 @@ def decode_opreturn_secret(data):
     try:
         secret = data.decode("ASCII")
         print(secret, '\n')
-        print('\007')
         return secret
     except:
         print('Decoding failed on:', data, '\n')
