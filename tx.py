@@ -48,6 +48,27 @@ class TxFetcher:
         return cls.cache[tx_id]
 
     @classmethod
+    def max_utxo_fetch(cls, address, testnet=True):
+        '''find the tx and id with most amount to spend from address'''
+        url = '{}/address/{}/utxo'.format(cls.get_url(testnet), address)
+        response = requests.get(url)
+        
+        try:
+            raw = json.loads(response.text)
+        except ValueError:
+            raise ValueError('unexpected response: {}'.format(response.text))
+
+        amounts = [x['value'] for x in raw]
+        max_amount_index = amounts.index(max(amounts))
+
+        prev_tx = bytes.fromhex(raw[max_amount_index]['txid'])
+        prev_index = raw[max_amount_index]['vout']
+
+        cls.cache[address] = TxIn(prev_tx, prev_index)
+
+        return cls.cache[address]
+
+    @classmethod
     def load_cache(cls, filename):
         disk_cache = json.loads(open(filename, 'r').read())
         for k, raw_hex in disk_cache.items():
