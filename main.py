@@ -23,15 +23,6 @@ p = PrivateKey(e)
 a = p.point.address(compressed=True, testnet=True)
 
 
-'''TODO
-1. Automate change calculation: use resend address and use feefilter
-2. Try a first OP_RETURN output
-3. Fill it
-4. Multiple outputs
-5. Fill it with art
-6. Try mainnet
-'''
-
 #txin
 tx_in = TxFetcher.max_utxo_fetch(address = PUBKEY)
 
@@ -49,6 +40,12 @@ target_h160 = decode_base58('mkHS9ne12qx9pS9VojpwU5xtRd4T7X7ZUt')
 target_script = p2pkh_script(target_h160)
 target_output = TxOut(amount=target_amount, script_pubkey=target_script)
 
+#opreturn output
+secret_amount = int(0)
+secret_payload = bytes('hello world', 'ascii')
+secret_script = secret_script(secret_payload)
+secret_output = TxOut(amount=secret_amount, script_pubkey=secret_script)
+
 #change output
 change_amount = int(tx_in.amount - target_amount - min_fee)
 change_h160 = p.point.hash160()
@@ -60,7 +57,7 @@ change_output = TxOut(amount=change_amount, script_pubkey=change_script)
 
 
 #create transaction, sign and send
-tx_obj = Tx(1, [tx_in], [change_output, target_output], locktime = 0, testnet = True)
+tx_obj = Tx(1, [tx_in], [change_output, target_output, secret_output], locktime = 0, testnet = True)
 tx_obj.sign_input(0, p)
 node.send(tx_obj)
 

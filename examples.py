@@ -3,7 +3,7 @@ from helpers import *
 from network import *
 from block import *
 from ecc import PrivateKey
-from script import p2pkh_script, Script
+from script import p2pkh_script, Script, secret_script
 from tx import TxIn, TxOut, Tx, TxFetcher
 from config import *
 from merkleblock import MerkleBlock

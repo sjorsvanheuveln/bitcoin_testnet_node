@@ -46,6 +46,10 @@ def p2wsh_script(h256):
     return Script([0x00, h256])  # <1>
 # end::source4[]
 
+def secret_script(cmd):
+    '''OP_RETURN payloading'''
+    return Script([0x6a, cmd])
+
 
 LOGGER = getLogger(__name__)
 
