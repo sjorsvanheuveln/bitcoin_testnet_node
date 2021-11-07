@@ -103,6 +103,10 @@ Run `main.py`.
           * Coinbase + fees are (can be) in 1 output.
           * Blockheight is also somewhere in there I believe.
 
+9. Node communication:
+     - Feefilter apparently doesn't need to asked for. It's sent after handshake.
+     - 
+
 
 ### Check Later ###
 - Stenography: sending messages hidden in images.

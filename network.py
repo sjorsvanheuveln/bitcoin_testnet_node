@@ -341,6 +341,34 @@ class InvMessage:
     def serialize(self):
         raise NotImplementedError('Serialization not yet implemented!')
 
+class RejectMessage:
+    '''Receive Inv'''
+    '''Inventory Vectors with data'''
+    command = b'reject'
+
+    def __init__(self, message, ccode, reason, data):
+        self.message = message
+        self.ccode = ccode
+        self.reason = reason
+        self.data = data
+
+    def __repr__(self):
+        return '\nCode: {}\nMessage: {}\nReason: {}\n'.format(self.ccode, self.message, self.reason)
+
+    @classmethod
+    def parse(cls, s):
+        message_length = read_varint(s)
+        message = s.read(message_length)
+        ccode = REJECT_CODE_NAMES[little_endian_to_int(s.read(1))]
+        reason_length = read_varint(s)
+        reason = s.read(reason_length)
+        data = None #perhaps able to parse this out
+
+        return cls(message, ccode, reason, data)
+
+    def serialize(self):
+        raise NotImplementedError('Serialization not yet implemented!')
+
 class GenericMessage:
     def __init__(self, command, payload):
         self.command = command
@@ -504,3 +532,15 @@ class InventoryVector:
         else:
             raise ValueError('Unknown InventoryVector data type')
         
+
+
+REJECT_CODE_NAMES = {
+    0x01: 'REJECT_MALFORMED',
+    0x10: 'REJECT_INVALID',
+    0x11: 'OBSOLETE',
+    0x12: 'REJECT_DUPLICATE',
+    0x40: 'REJECT_NONSTANDARD',
+    0x41: 'REJECT_DUST',
+    0x42: 'REJECT_INSUFFICIENT_FEE',
+    0x43: 'REJECT_CHECKPOINT',
+}
