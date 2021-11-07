@@ -1,7 +1,7 @@
 # Bitcoin Tesnet Node: Sending Transactions #
 Created by Sjors van Heuveln, 1 nov 2021.
 
-![Satoshi City](https://preview.redd.it/98d2sxhnh2t31.jpg)
+![Satoshi City](https://preview.redd.it/98d2sxhnh2t31.jpg?width=3840&format=pjpg&auto=webp&s=7add8087278f2f8847881a2226d3397ac1778d80)
 
 ### How to Use ###
 Run `main.py`.
