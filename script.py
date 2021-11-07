@@ -44,7 +44,6 @@ def p2wpkh_script(h160):
 def p2wsh_script(h256):
     '''Takes a hash160 and returns the p2wsh ScriptPubKey'''
     return Script([0x00, h256])  # <1>
-# end::source4[]
 
 def secret_script(cmd):
     '''OP_RETURN payloading'''
