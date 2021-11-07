@@ -154,14 +154,17 @@ def h160_to_wpkh_address(h160, testnet=False, taproot=False):
     taproot_flag = 1 if taproot else 0
     return segwit_encode(hrp, taproot_flag, h160)
 
-# def h160_to_wsh_address(h160, testnet=False):
-#     raise NotImplementedError('Hi')
-#     if testnet:
-#         hrp = 'tb'
-#     else:
-#         hrp = 'bc'
-#     return segwit_encode(hrp, 0, h160)
-
+def chop_OP_RETURN_message(message):
+    ''' OP_RETURN Outputs can only carry 520b of data'''
+    max_cmd = 520
+    msg_chunks = []
+    for i in range(0, len(message), max_cmd):
+        end = max_cmd + i
+        if end > len(message):
+            msg_chunks.append(message[i:len(message)])
+            break    
+        msg_chunks.append(message[i:end])
+    return msg_chunks
 
 
 '''blocks'''
