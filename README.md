@@ -18,13 +18,13 @@ Run `main.py`.
 
 ### To do ###
 
-1. Create a fake pubscript that locks a message on the testnet blockchain with OP_RETURN.
-2. Fix Bad TX filter
+1. Handle reject messages. -> when waiting for a message seems to make it process, but that's weird!
+2. Check if transactions can get rejected on fees.
+
+<!-- 2. Fix Bloom Filter incoming Txs
      - Parse the transaction manually, see where it goes wrong.
      - I think somehow I'm fishing out the hacks I think, my script mostly works fine.
-3. Get UTXOs of my pubkey. -> merkleblock and bloomfilter
-     - And automate the transaction.
-4. Decode a hidden message -> Len Sassaman -> TxFetch
+ -->
 
 
 ### Resources ###
