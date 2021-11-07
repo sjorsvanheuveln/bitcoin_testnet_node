@@ -17,15 +17,18 @@ from script import *
 #getMempool(TESTNET_HOST2)
 #bloomfilter()
 #send_ascii_tx(bytes('wzup bitcoiners', 'ascii'))
-#art_from_chain('854221eb19fbb40e0fb32058da65b909f236aab7da2078327dd909704602580c')
+#art_from_chain('a9ef5d93aa87b8bc065055b9b5e9e116b92f77974c95ac51bbf9d9e4a9f5b77c')
 #send_simple_tx(RETURN_COIN_FAUCET_ADDRESS)
 ####################################
 
-# handle reject messages
+
 
 e = little_endian_to_int(hash256(PASSPHRASE))
 p = PrivateKey(e)
-msg = bytes("I didn't come here to tell you how this is going to end.", 'ascii')
+#p.point.address(testnet = True)
+msg = bytes("Hello world uit Zeeland.", 'ascii')
+
+
 
 #txin
 tx_in = TxFetcher.max_utxo_fetch(address = PUBKEY)
@@ -36,7 +39,6 @@ outputs = []
 node = SimpleNode(TESTNET_HOST2, testnet=True, logging=True)
 node.handshake()
 
-#node.send(GenericMessage(b'feefilter', b''))
 min_fee = node.wait_for(FeefilterMessage).fee
 
 #opreturn output

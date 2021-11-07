@@ -297,6 +297,29 @@ class MempoolMessage:
     def serialize(self):
         return b''
 
+class CmpctMessage:
+    '''Request mempool transactions hashes'''
+    '''Response is an inv message'''
+    command = b'sendcmpct'
+
+    def __init__(self, announce, version):
+        self.announce = announce
+        self.version = version
+
+    def __repr__(self):
+        return '\nAnnounce: {}\nVersion: {}\n'.format(self.announce, self.version)
+
+    @classmethod
+    def parse(cls, s):
+        announce = little_endian_to_int(s.read(1))
+        version = little_endian_to_int(s.read(8))
+
+        return cls(announce, version)
+
+    def serialize(self):
+        raise NotImplementedError()
+
+
 class GetDataMessage:
     command = b'getdata'
 

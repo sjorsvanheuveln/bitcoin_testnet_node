@@ -18,8 +18,9 @@ Run `main.py`.
 
 ### To do ###
 
-1. Handle reject messages. -> when waiting for a message seems to make it process, but that's weird!
-2. Check if transactions can get rejected on fees.
+1. Learn on fee calculation
+     - Calculate sats per byte per transaction and print to console.
+     - What is sats/vbyte?
 
 <!-- 2. Fix Bloom Filter incoming Txs
      - Parse the transaction manually, see where it goes wrong.
@@ -105,7 +106,13 @@ Run `main.py`.
 
 9. Node communication:
      - Feefilter apparently doesn't need to asked for. It's sent after handshake.
-     - 
+     - sendcmpct: boolean -> flags for either sending blocks through cmpct blocks or inv (BIP0130)
+     - inv: are sent on new tips
+
+10. Mainnet:
+     - Address:
+          * Pubkey and hashes are the same with testnet
+          * Addresses have different prefixes though, giving them their distinct ... prefix.
 
 
 ### Check Later ###
