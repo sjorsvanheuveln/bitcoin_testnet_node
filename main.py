@@ -28,7 +28,7 @@ e = little_endian_to_int(hash256(PASSPHRASE))
 p = PrivateKey(e)
 a = p.point.address(testnet = testnet)
 print(a)
-msg = bytes("Sup testnet!", 'ascii')
+msg = bytes("Bech32 p2wpkh test! Follow me @bitcoingraffiti.", 'ascii')
 
 
 #txin
@@ -46,9 +46,14 @@ payload_amount = 0
 payload_script = secret_script(msg)
 outputs.append(TxOut(amount=payload_amount, script_pubkey=payload_script))
 
+#bech32 p2wpkh output
+bech32_amount = int(1000)
+bech32_h160 = p.point.hash160()
+bech32_script = p2wpkh_script(change_h160)
+outputs.append(TxOut(amount=change_amount, script_pubkey=change_script))
 
 #change output
-change_amount = int(tx_in.amount - min_fee)
+change_amount = int(tx_in.amount - bech32_amount - min_fee)
 change_h160 = p.point.hash160()
 change_script = p2pkh_script(change_h160)
 outputs.append(TxOut(amount=change_amount, script_pubkey=change_script))

@@ -23,7 +23,8 @@ Run `main.py`.
           - largest utxo
 4. New Tx:
      - Make a BECH32 P2WPKH tx. -> Send from mainnet address to Exodus! 
-     - What are all the differences?
+     - What are all the differences?!!!!
+          - What were the reasons to change drom p2pkh?
      - Adjust the address function
 
 <!-- 2. Fix Bloom Filter incoming Txs
