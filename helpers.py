@@ -156,7 +156,7 @@ def h160_to_wpkh_address(h160, testnet=False, taproot=False):
 
 def chop_OP_RETURN_message(message):
     ''' OP_RETURN Outputs can only carry 520b of data'''
-    max_cmd = 520
+    max_cmd = 520 #max byte length per OP_output
     msg_chunks = []
     for i in range(0, len(message), max_cmd):
         end = max_cmd + i
