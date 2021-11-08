@@ -15,11 +15,16 @@ Run `main.py`.
      - What is sats/vbyte?
 2. Mainnet:
      - Send the Saylor!
+          -> Multiple OP_RETURNS not allowed.
 3. UTXO:
      - Make a better UTXO function. So I can see what my address has.
      - Make a class with functions and data.
           - count
           - largest utxo
+4. New Tx:
+     - Make a BECH32 P2WPKH tx. -> Send from mainnet address to Exodus! 
+     - What are all the differences?
+     - Adjust the address function
 
 <!-- 2. Fix Bloom Filter incoming Txs
      - Parse the transaction manually, see where it goes wrong.
