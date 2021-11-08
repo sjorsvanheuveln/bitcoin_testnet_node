@@ -17,28 +17,37 @@ from script import *
 #getMempool(TESTNET_HOST2)
 #bloomfilter()
 #send_ascii_tx(bytes('wzup bitcoiners', 'ascii'))
-art_from_chain('a9ef5d93aa87b8bc065055b9b5e9e116b92f77974c95ac51bbf9d9e4a9f5b77c')
+art_from_chain('10ac071ab97dfff11121f4caae401437c9a180b90f0de81915f4b44d088e71fd', testnet=False)
 #send_simple_tx(RETURN_COIN_FAUCET_ADDRESS)
 ####################################
 
 
+'''waiting for:
+c79037d71c3fab841e80f371e1ef21ed70e7d857f9adad920f563c771f55e9da
+502ad1b0b7823a6babb30e9ffba53351e895e6a4ffce351dbd11a1e782c741b0
+aa1605bd35c6f60a4fc17f54cd9720f728dd0d0f5ad2543e7cf0ae2ea69e37c7
+'''
 
 # e = little_endian_to_int(hash256(PASSPHRASE))
 # p = PrivateKey(e)
-# #p.point.address(testnet = True)
-# msg = bytes("Hello world uit Zeeland.", 'ascii')
+# a = p.point.address(testnet = False)
+# print(a)
+# msg = bytes("Hello Mainnet!", 'ascii')
 
 
 # #txin
-# tx_in = TxFetcher.max_utxo_fetch(address = PUBKEY)
+# tx_in = TxFetcher.max_utxo_fetch(address = a, testnet=False)
 
 
 # outputs = []
 # '''hand shake and get min fee'''
-# node = SimpleNode(TESTNET_HOST2, testnet=True, logging=True)
+# node = SimpleNode(TESTNET_HOST3, testnet=False, logging=True)
 # node.handshake()
 
 # min_fee = node.wait_for(FeefilterMessage).fee
+# if min_fee < 100:
+#     min_fee = 250
+#     print('reset fee to:', min_fee)
 
 # #opreturn output
 # payload_amount = 0
@@ -54,7 +63,7 @@ art_from_chain('a9ef5d93aa87b8bc065055b9b5e9e116b92f77974c95ac51bbf9d9e4a9f5b77c
 
 
 # #create transaction, sign and send
-# tx_obj = Tx(1, [tx_in], outputs, locktime = 0, testnet = True)
+# tx_obj = Tx(1, [tx_in], outputs, locktime = 0, testnet = False)
 # tx_obj.sign_input(0, p)
 # node.send(tx_obj)
 

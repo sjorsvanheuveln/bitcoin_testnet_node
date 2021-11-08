@@ -14,7 +14,12 @@ Run `main.py`.
      - Calculate sats per byte per transaction and print to console.
      - What is sats/vbyte?
 2. Mainnet:
-     - Coins sent to: 18XjqnHBAmbWkiXgWr4Pnc3mjj7jT2yCNc
+     - Send the Saylor!
+3. UTXO:
+     - Make a better UTXO function. So I can see what my address has.
+     - Make a class with functions and data.
+          - count
+          - largest utxo
 
 <!-- 2. Fix Bloom Filter incoming Txs
      - Parse the transaction manually, see where it goes wrong.
