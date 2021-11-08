@@ -22,10 +22,12 @@ Run `main.py`.
           - count
           - largest utxo
 4. New Tx:
-     - Make a BECH32 P2WPKH tx. -> Send from mainnet address to Exodus! 
+     - Make a BECH32 P2WPKH tx.
+          * Spending to is possible already. 
+          * Spending from not yet -> witness required.
      - What are all the differences?!!!!
           - What were the reasons to change drom p2pkh?
-     - Adjust the address function
+     - Adjust the address function of the public key to allow multiple adresses.
 
 <!-- 2. Fix Bloom Filter incoming Txs
      - Parse the transaction manually, see where it goes wrong.

@@ -1,5 +1,6 @@
 import hashlib
 from bech32 import segwit_encode, segwit_decode, bech32_encode, bech32_decode
+#from tx import TxOut
 
 ''' constants '''
 SIGHASH_ALL = 1
@@ -154,6 +155,7 @@ def h160_to_wpkh_address(h160, testnet=False, taproot=False):
     taproot_flag = 1 if taproot else 0
     return segwit_encode(hrp, taproot_flag, h160)
 
+
 def chop_OP_RETURN_message(message):
     ''' OP_RETURN Outputs can only carry 520b of data'''
     max_cmd = 520 #max byte length per OP_output
@@ -165,7 +167,6 @@ def chop_OP_RETURN_message(message):
             break    
         msg_chunks.append(message[i:end])
     return msg_chunks
-
 
 '''blocks'''
 def bits_to_target(bits):
