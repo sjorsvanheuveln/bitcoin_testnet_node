@@ -322,6 +322,8 @@ class Tx:
         # check to see if the ScriptPubkey is a p2sh
         if script_pubkey.is_p2sh_script_pubkey():
             # the last cmd has to be the RedeemScript to trigger
+            #this should be added onto the tx_in script commands
+            #redeem scripts should be stored off-chain!!!
             cmd = tx_in.script_sig.cmds[-1]
             # parse the RedeemScript
             raw_redeem = int_to_little_endian(len(cmd), 1) + cmd
@@ -337,10 +339,11 @@ class Tx:
                 z = self.sig_hash_bip143(input_index, witness_script=witness_script)
                 witness = tx_in.witness
             else:
+                #if p2sh
                 z = self.sig_hash(input_index, redeem_script)
                 witness = None
         else:
-            # ScriptPubkey might be a p2wpkh or p2wsh
+            # ScriptPubkey might be a p2wpkh, p2wsh or p2pkh
             if script_pubkey.is_p2wpkh_script_pubkey():
                 z = self.sig_hash_bip143(input_index)
                 witness = tx_in.witness
@@ -351,6 +354,7 @@ class Tx:
                 z = self.sig_hash_bip143(input_index, witness_script=witness_script)
                 witness = tx_in.witness
             else:
+                #p2pkh
                 z = self.sig_hash(input_index)
                 witness = None
         # combine the current ScriptSig and the previous ScriptPubKey

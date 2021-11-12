@@ -8,7 +8,7 @@ from helpers import (
     encode_varint,
     h160_to_p2pkh_address,
     h160_to_p2sh_address,
-    h160_to_wpkh_address,
+    h160_to_p2wpkh_address,
     int_to_little_endian,
     little_endian_to_int,
     read_varint,
@@ -300,18 +300,18 @@ class Script:
         elif self.is_p2wpkh_script_pubkey():
             h160 = self.cmds[1]
             #print('segwit', h160_to_wpkh_address(h160, testnet))
-            return h160_to_wpkh_address(h160, testnet)
+            return h160_to_p2wpkh_address(h160, testnet)
             
         elif self.is_p2wsh_script_pubkey():
             h160 = self.cmds[1]
             taproot = False
             print('\nP2WSH:\n\n', h160_to_wpkh_address(h160, testnet))
-            return h160_to_wpkh_address(h160, testnet)
+            return h160_to_p2wpkh_address(h160, testnet)
 
         elif self.is_taproot_script_pubkey():
             h160 = self.cmds[1]
             taproot = True
-            print('\nTaproot-BECH32M:\n\n', h160_to_wpkh_address(h160, testnet, taproot))
+            print('\nTaproot-BECH32M:\n\n', h160_to_p2wpkh_address(h160, testnet, taproot))
             return h160_to_wpkh_address(h160, testnet, taproot)
 
         #deactivated valueError

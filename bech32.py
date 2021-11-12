@@ -103,7 +103,7 @@ def segwit_decode(hrp, addr):
         return (None, None)
     return (data[0], decoded)
 
-
+    
 def segwit_encode(hrp, witver, witprog):
     """Encode a segwit address."""
     spec = Encoding.BECH32 if witver == 0 else Encoding.BECH32M

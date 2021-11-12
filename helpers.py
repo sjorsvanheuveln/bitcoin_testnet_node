@@ -126,7 +126,6 @@ def encode_varint(i):
         raise ValueError('integer too large: {}'.format(i))
 
 
-
 '''scripting'''
 def h160_to_p2pkh_address(h160, testnet=False):
     '''Takes a byte sequence hash160 and returns a p2pkh address string'''
@@ -148,12 +147,20 @@ def h160_to_p2sh_address(h160, testnet=False):
     return encode_base58_checksum(prefix + h160)
 
 
-def h160_to_wpkh_address(h160, testnet=False, taproot=False):
+def h160_to_p2wpkh_address(h160, testnet=False, taproot=False):
     
     hrp = 'tb' if testnet else 'bc'
 
     taproot_flag = 1 if taproot else 0
     return segwit_encode(hrp, taproot_flag, h160)
+
+def h160_to_p2wsh_address(h160, testnet=False, taproot=False):
+    
+    hrp = 'tb' if testnet else 'bc'
+
+    #taproot_flag = 1 if taproot else 0
+    #return segwit_encode(hrp, taproot_flag, h160)
+    raise NotImplementedError('p2wsh')
 
 
 def chop_OP_RETURN_message(message):

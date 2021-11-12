@@ -23,25 +23,21 @@ from script import *
 #send_simple_tx(RETURN_COIN_FAUCET_ADDRESS)
 ####################################
 
-'''questions
-1. Grabbing the utxos is only based on address right? -> Yes! At least that's how that api is designed.
-
-  - I guess I should make the p.point function able to convert to all types of addresses.
-  - Use that as input for the max_utxo function -> so that amount of that utxo is being parsed too.
-'''
-
 testnet = True
+
 e = little_endian_to_int(hash256(PASSPHRASE))
 p = PrivateKey(e)
-a = p.point.address(testnet = testnet)
-msg = bytes("Sup bitcoiners! Follow me @bitcoingraffiti.", 'ascii')
+a = p.point.address(testnet = testnet, script_type = 'p2wpkh')
+msg = bytes("p2wpkh pay test. Follow me @bitcoingraffiti", 'ascii')
+
 
 
 #txin
 tx_in = TxFetcher.max_utxo_fetch(address = a, testnet=testnet)
+
+
 #wanna spend from this p2wpkh address: tb1q22v37zwl0c9wkx9ttvddkap00hawu2pj9lx2tx
-
-
+print(a, tx_in)
 
 outputs = []
 '''hand shake and get min fee'''
@@ -55,21 +51,28 @@ payload_script = secret_script(msg)
 outputs.append(TxOut(amount=payload_amount, script_pubkey=payload_script))
 
 #bech32 p2wpkh output
-# bech32_amount = int(0)
+# bech32_amount = int(10000)
 # bech32_h160 = p.point.hash160()
 # print('h160', bech32_h160.hex())
 # bech32_script = p2wpkh_script(bech32_h160)
 # outputs.append(TxOut(amount=bech32_amount, script_pubkey=bech32_script))
 
+#p2sh target
+# target_amount = int(1000)
+# target_h160 = p.point.hash160()
+# target_script = p2sh_script(target_h160)
+# outputs.append(TxOut(amount=target_amount, script_pubkey=target_script))
+
 #change output
-change_amount = int(tx_in.amount - min_fee)
+sats = sum(o.amount for o in outputs)
+change_amount = int(tx_in.amount - sats - min_fee)
 change_h160 = p.point.hash160()
 change_script = p2pkh_script(change_h160)
 outputs.append(TxOut(amount=change_amount, script_pubkey=change_script))
 
 
-#create transaction, sign and send
-tx_obj = Tx(1, [tx_in], outputs, locktime = 0, testnet = testnet)
+# #create transaction, sign and send
+tx_obj = Tx(1, [tx_in], outputs, locktime = 0, testnet = testnet, segwit = False)
 tx_obj.sign_input(0, p)
 node.send(tx_obj)
 

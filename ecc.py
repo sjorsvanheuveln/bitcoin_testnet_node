@@ -4,7 +4,7 @@ from random import randint
 import hashlib
 import hmac
 
-from helpers import encode_base58_checksum, hash160
+from helpers import encode_base58_checksum, hash160, h160_to_p2pkh_address, h160_to_p2sh_address, h160_to_p2wpkh_address
 
 
 class FieldElement:
@@ -236,14 +236,26 @@ class S256Point(Point):
     def hash160(self, compressed=True):
         return hash160(self.sec(compressed))
 
-    def address(self, compressed=True, testnet=False):
+    def address(self, compressed=True, testnet=False, script_type = 'p2pkh', taproot = False):
         '''Returns the address string'''
         h160 = self.hash160(compressed)
-        if testnet:
-            prefix = b'\x6f'
+
+        if script_type == 'p2pkh':
+            address = h160_to_p2pkh_address(h160, testnet)
+        elif script_type == 'p2sh':
+            address = h160_to_p2sh_address(h160, testnet)
+        elif script_type == 'p2wpkh':
+            address = h160_to_p2wpkh_address(h160, testnet, taproot)
+        elif script_type == 'p2wsh':
+            raise NotImplementedError('Need to work out this')
+            address = h160_to_p2wpkh_address(h160, testnet, taproot)
+        elif script_type == 'taproot' and taproot:
+            address = h160_to_p2wpkh_address(h160, testnet, taproot)
         else:
-            prefix = b'\x00'
-        return encode_base58_checksum(prefix + h160)
+            raise ValueError('Unknown script type', script_type)
+
+        return address
+
 
     @classmethod
     def parse(self, sec_bin):
