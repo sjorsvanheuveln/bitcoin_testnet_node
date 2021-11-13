@@ -195,16 +195,17 @@ class Tx:
 
     def serialize_segwit(self):
         result = int_to_little_endian(self.version, 4)
-        result += b'\x00\x01'  # <2>
+        result += b'\x00\x01'
         result += encode_varint(len(self.tx_ins))
         for tx_in in self.tx_ins:
             result += tx_in.serialize()
         result += encode_varint(len(self.tx_outs))
         for tx_out in self.tx_outs:
             result += tx_out.serialize()
-        for tx_in in self.tx_ins:  # <3>
+        for tx_in in self.tx_ins:
             result += int_to_little_endian(len(tx_in.witness), 1)
             for item in tx_in.witness:
+                print('hi witness', item)
                 if type(item) == int:
                     result += int_to_little_endian(item, 1)
                 else:
@@ -373,10 +374,11 @@ class Tx:
                 return False
         return True
 
-    def sign_input(self, input_index, private_key):
+    def sign_input(self, input_index, private_key, segwit = False):
         '''Signs the input using the private key'''
         # get the signature hash (z)
-        z = self.sig_hash(input_index)
+        z = self.sig_hash_bip143(input_index) if segwit else self.sig_hash(input_index)
+     
         # get der signature of z from private key
         der = private_key.sign(z).der()
         # append the SIGHASH_ALL to der (use SIGHASH_ALL.to_bytes(1, 'big'))
@@ -385,8 +387,13 @@ class Tx:
         sec = private_key.point.sec()
         # initialize a new script with [sig, sec] as the cmds
         script_sig = Script([sig, sec])
+
         # change input's script_sig to new script
-        self.tx_ins[input_index].script_sig = script_sig
+        if segwit:
+            self.tx_ins[input_index].witness = [sig, sec]
+        else:
+            self.tx_ins[input_index].script_sig = script_sig
+
         # return whether sig is valid using self.verify_input
         return self.verify_input(input_index)
 

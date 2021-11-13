@@ -13,6 +13,7 @@ Run `main.py`.
 1. Learn on fee calculation
      - Calculate sats per byte per transaction and print to console.
      - What is sats/vbyte?
+
 2. Mainnet:
      - Send the Saylor!
           -> Multiple OP_RETURNS not allowed.
@@ -26,8 +27,7 @@ Run `main.py`.
           * Spending to is possible already. 
           * Spending from not yet -> witness required.
      - What are all the differences?!!!!
-          - What were the reasons to change drom p2pkh?
-     - Adjust the address function of the public key to allow multiple adresses.
+
 
 <!-- 2. Fix Bloom Filter incoming Txs
      - Parse the transaction manually, see where it goes wrong.

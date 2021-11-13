@@ -24,17 +24,16 @@ from script import *
 ####################################
 
 testnet = True
-
+segwit = True
 e = little_endian_to_int(hash256(PASSPHRASE))
 p = PrivateKey(e)
-a = p.point.address(testnet = testnet, script_type = 'p2wpkh')
-msg = bytes("p2wpkh pay test. Follow me @bitcoingraffiti", 'ascii')
+a = p.point.address(testnet = testnet, segwit = segwit)
+msg = bytes("p2wpkh to p2wpkh #1. Follow me @bitcoingraffiti", 'ascii')
 
 
 
 #txin
 tx_in = TxFetcher.max_utxo_fetch(address = a, testnet=testnet)
-
 
 #wanna spend from this p2wpkh address: tb1q22v37zwl0c9wkx9ttvddkap00hawu2pj9lx2tx
 print(a, tx_in)
@@ -53,27 +52,22 @@ outputs.append(TxOut(amount=payload_amount, script_pubkey=payload_script))
 #bech32 p2wpkh output
 # bech32_amount = int(10000)
 # bech32_h160 = p.point.hash160()
-# print('h160', bech32_h160.hex())
 # bech32_script = p2wpkh_script(bech32_h160)
 # outputs.append(TxOut(amount=bech32_amount, script_pubkey=bech32_script))
 
-#p2sh target
-# target_amount = int(1000)
-# target_h160 = p.point.hash160()
-# target_script = p2sh_script(target_h160)
-# outputs.append(TxOut(amount=target_amount, script_pubkey=target_script))
 
 #change output
 sats = sum(o.amount for o in outputs)
 change_amount = int(tx_in.amount - sats - min_fee)
 change_h160 = p.point.hash160()
-change_script = p2pkh_script(change_h160)
+change_script = p2wpkh_script(change_h160)
 outputs.append(TxOut(amount=change_amount, script_pubkey=change_script))
 
 
 # #create transaction, sign and send
-tx_obj = Tx(1, [tx_in], outputs, locktime = 0, testnet = testnet, segwit = False)
-tx_obj.sign_input(0, p)
+tx_obj = Tx(1, [tx_in], outputs, locktime = 0, testnet = testnet, segwit = segwit)
+tx_obj.sign_input(0, p, segwit=segwit)
+
 node.send(tx_obj)
 
 print('wait for reject msg')

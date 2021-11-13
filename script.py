@@ -156,6 +156,7 @@ class Script:
     def serialize(self):
         # get the raw serialization (no prepended length)
         result = self.raw_serialize()
+
         # get the length of the whole thing
         total = len(result)
         # encode_varint the total length of the result and prepend
@@ -271,7 +272,7 @@ class Script:
             and type(self.cmds[1]) == bytes and len(self.cmds[1]) == 20 \
             and self.cmds[2] == 0x87
 
-    def is_p2wpkh_script_pubkey(self):  # <2>
+    def is_p2wpkh_script_pubkey(self):
         return len(self.cmds) == 2 and self.cmds[0] == 0x00 \
             and type(self.cmds[1]) == bytes and len(self.cmds[1]) == 20
 

@@ -236,20 +236,15 @@ class S256Point(Point):
     def hash160(self, compressed=True):
         return hash160(self.sec(compressed))
 
-    def address(self, compressed=True, testnet=False, script_type = 'p2pkh', taproot = False):
+    def address(self, compressed=True, testnet=False, segwit = False, taproot = False):
         '''Returns the address string'''
         h160 = self.hash160(compressed)
 
-        if script_type == 'p2pkh':
+        if not segwit:
             address = h160_to_p2pkh_address(h160, testnet)
-        elif script_type == 'p2sh':
-            address = h160_to_p2sh_address(h160, testnet)
-        elif script_type == 'p2wpkh':
+        elif segwit:
             address = h160_to_p2wpkh_address(h160, testnet, taproot)
-        elif script_type == 'p2wsh':
-            raise NotImplementedError('Need to work out this')
-            address = h160_to_p2wpkh_address(h160, testnet, taproot)
-        elif script_type == 'taproot' and taproot:
+        elif segwit and taproot:
             address = h160_to_p2wpkh_address(h160, testnet, taproot)
         else:
             raise ValueError('Unknown script type', script_type)
