@@ -28,7 +28,7 @@ segwit = True
 e = little_endian_to_int(hash256(PASSPHRASE))
 p = PrivateKey(e)
 a = p.point.address(testnet = testnet, segwit = segwit)
-msg = bytes("p2wpkh to p2wpkh #1. Follow me @bitcoingraffiti", 'ascii')
+msg = bytes("Taproot activation soooon! Follow me @bitcoingraffiti", 'ascii')
 
 
 
@@ -65,9 +65,9 @@ outputs.append(TxOut(amount=change_amount, script_pubkey=change_script))
 
 
 # #create transaction, sign and send
-tx_obj = Tx(1, [tx_in], outputs, locktime = 0, testnet = testnet, segwit = segwit)
+tx_obj = Tx(1, [tx_in], outputs, locktime = 5, testnet = testnet, segwit = segwit)
 tx_obj.sign_input(0, p, segwit=segwit)
-
+print(tx_obj.size())
 node.send(tx_obj)
 
 print('wait for reject msg')

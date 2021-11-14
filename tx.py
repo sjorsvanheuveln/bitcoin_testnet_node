@@ -205,13 +205,33 @@ class Tx:
         for tx_in in self.tx_ins:
             result += int_to_little_endian(len(tx_in.witness), 1)
             for item in tx_in.witness:
-                print('hi witness', item)
                 if type(item) == int:
                     result += int_to_little_endian(item, 1)
                 else:
                     result += encode_varint(len(item)) + item
         result += int_to_little_endian(self.locktime, 4)
         return result
+
+    def size(self):
+        '''calculates transaction size and fee_rate'''
+        raw = len(self.serialize())
+        segwit = 0
+        if self.segwit == True:
+            for txin in self.tx_ins:
+                for item in txin.witness:
+                    #count whether there are ops???
+                    segwit += len(item)
+            segwit += 5 #market, flag, len and 2 varints
+
+        non_segwit = raw - segwit
+        wu = 4 * non_segwit + segwit
+        vsize = round(wu / 4, 2)
+        fee = self.fee()
+        sats_per_byte = round(fee / raw, 2)
+        sats_per_vbyte = round(fee / vsize, 2)
+
+        return '\nraw size: {}\nWU: {}\nvSize: {}\nSats/B: {}\nSats/vB: {}\n'.format(raw, wu, vsize, sats_per_byte, sats_per_vbyte)
+
 
     def fee(self):
         '''Returns the fee of this transaction in satoshi'''
