@@ -24,13 +24,11 @@ from script import *
 ####################################
 
 testnet = True
-segwit = True
+segwit = False
 e = little_endian_to_int(hash256(PASSPHRASE))
 p = PrivateKey(e)
 a = p.point.address(testnet = testnet, segwit = segwit)
-msg = bytes("Taproot activation soooon! Follow me @bitcoingraffiti", 'ascii')
-
-
+msg = bytes("Mainnet test to exodus. Follow me @bitcoingraffiti", 'ascii')
 
 #txin
 tx_in = TxFetcher.max_utxo_fetch(address = a, testnet=testnet)
@@ -40,9 +38,10 @@ print(a, tx_in)
 
 outputs = []
 '''hand shake and get min fee'''
-node = SimpleNode(TESTNET_HOST2, testnet=testnet, logging=True)
+node = SimpleNode(TESTNET_HOST, testnet=testnet, logging=True)
 node.handshake()
-min_fee = node.wait_for(FeefilterMessage).fee
+#min_fee = node.wait_for(FeefilterMessage).fee
+min_fee = 300
 
 #opreturn output
 payload_amount = 0
@@ -55,6 +54,11 @@ outputs.append(TxOut(amount=payload_amount, script_pubkey=payload_script))
 # bech32_script = p2wpkh_script(bech32_h160)
 # outputs.append(TxOut(amount=bech32_amount, script_pubkey=bech32_script))
 
+# target_amount = int(9700)
+# target_h160 = decode_base58('1DDCf7R21FkmSXmYcL1ktr5e8ecnGXzzTX')
+# target_script = p2pkh_script(target_h160)
+# outputs.append(TxOut(amount=target_amount, script_pubkey=target_script))
+
 
 #change output
 sats = sum(o.amount for o in outputs)
@@ -64,8 +68,10 @@ change_script = p2wpkh_script(change_h160)
 outputs.append(TxOut(amount=change_amount, script_pubkey=change_script))
 
 
+
+
 # #create transaction, sign and send
-tx_obj = Tx(1, [tx_in], outputs, locktime = 5, testnet = testnet, segwit = segwit)
+tx_obj = Tx(1, [tx_in], outputs, locktime = 0, testnet = testnet, segwit = segwit)
 tx_obj.sign_input(0, p, segwit=segwit)
 print(tx_obj.size())
 node.send(tx_obj)
