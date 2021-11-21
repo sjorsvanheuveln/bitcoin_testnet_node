@@ -23,11 +23,16 @@ class Database:
     def add(self, block):
         '''adds a block to the database'''
         # build a check whether current hash is in db already
-        self.collection.insert_one(block.mongodb_object())
+        if not self.is_in_collection(block.id()):
+            print('Adding:', block.id())
+            self.collection.insert_one(block.mongodb_object())
 
     def is_in_collection(self, blockhash):
+        '''checks if block is already in db'''
         result = self.collection.find({"_id": blockhash})
-        print('result', list(result))
+        if result.count() == 0:
+            return False
+        return True
 
     def add_multiple(self, blocks):
         for block in blocks:
@@ -37,14 +42,26 @@ class Database:
         '''removes the collection'''
         self.collection.drop()
 
-    def insert_fake(self):
-        new_id = random.randint(0, 1000000)
-        self.collection.insert_one({"name": "sjors", "score": 5})
+    def latest_block(self):
+        '''returns block with maximum registered height'''
+        return self.collection.find_one(sort=[("height", -1)])
 
-    def blockheight_sort(self):
-        raise NotImplementedError()
+    # def next_block(self, block_id):
+    #     '''returns the next block given prev_hash'''
+    #     print('next block', block_id)
+    #     return self.collection.find({'prev_block': block_id})
 
-      
+    def height_update(self):
+        '''Adds height to new blocks'''
+        while self.collection.find({'height': None}).count() > 0:
+
+            start_block = self.latest_block()
+            next_block_query = { 'prev_block': start_block['_id'] }
+            new_height = {"$set": {'height': start_block['height'] + 1}}
+            self.collection.update_one(next_block_query, new_height)
+            print('New height:', start_block['height'])
+
+        
 
 class Block:
 
@@ -154,7 +171,7 @@ def get_block(n, files = 1):
         while s.peek(1) != b'':
             b = Block.parse(s)
             blocks.append(b)
-            print(len(blocks) - 1, b)
+            #print(len(blocks) - 1, b)
             if len(blocks) == n: break
 
     return blocks
