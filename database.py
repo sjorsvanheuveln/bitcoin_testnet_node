@@ -29,7 +29,7 @@ class Database:
         '''adds a block to the database'''
         # build a check whether current hash is in db already
         if not self.is_in_collection(block.id()):
-            print('Adding:', block.id())
+            print('Adding:', block.id(), end='\r')
             self.collection.insert_one(block.mongodb_object())
 
     def is_in_collection(self, blockhash):
@@ -56,12 +56,9 @@ class Database:
     #     print('next block', block_id)
     #     return self.collection.find({'prev_block': block_id})
 
-    def height_update(self):
+    def update_block_heights(self):
         '''Adds height to new blocks'''
-        #this function could be more efficient, perhaps by using async
-        if self.collection.find({'height': None}).count() == 0:
-            print('all blocks have height')
-            return
+        #perhaps can still improve by retrieve all at once update all and then update database
         start_block = self.latest_block()
 
         while True:
@@ -73,7 +70,6 @@ class Database:
             print('New height:', start_block['height'], end='\r')
             
 
-        
 
 class Block:
 
@@ -91,7 +87,7 @@ class Block:
         return 'Blockhash: {} tx:{}'.format(self.id(), self.tx_count)
 
     @classmethod
-    def parse(cls, s):
+    def parse(cls, s, parse_tx_flag):
         magic = s.read(4)
         if magic != NETWORK_MAGIC:
             raise ValueError('magic not correct')
@@ -105,9 +101,14 @@ class Block:
         bits = s.read(4)
         nonce = s.read(4)
 
-        tx_count = read_varint(s)
+        #transactions
         tx = []
-        for i in range(tx_count): tx.append(Tx.parse(s))
+        if parse_tx_flag:
+            tx_count = read_varint(s)
+            for i in range(tx_count): tx.append(Tx.parse(s))
+        else:
+            tx_count = None
+            s.read(size - 80)
 
         return cls(version, prev_block, merkle_root, timestamp, bits, nonce, tx_count, tx)
 
@@ -173,17 +174,17 @@ class Block:
 
         return True
 
-def get_block(n, files = 1):
+def get_block(n, files = 1, parse_tx_flag = True):
     path = '/Users/sjorsvanheuveln/Library/Application Support/Bitcoin/blocks/'
     blocks = []
 
     for i in range(0, files):
         print('blk', i)
         s = open(path + "blk" + str(i).zfill(5) + ".dat", "rb")
+
         while s.peek(1) != b'':
-            b = Block.parse(s)
+            b = Block.parse(s, parse_tx_flag)
             blocks.append(b)
-            #print(len(blocks) - 1, b)
             if len(blocks) == n: break
 
     return blocks
