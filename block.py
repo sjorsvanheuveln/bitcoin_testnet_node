@@ -5,6 +5,7 @@ from helpers import (
     hash256,
     int_to_little_endian,
     little_endian_to_int,
+    read_varint
 )
 
 #block serialization
@@ -20,7 +21,7 @@ testnet_block_3 = bytes.fromhex('000000008b896e272758da5297bcd98fdc6d97c9b765ece
 
 class Block:
 
-    def __init__(self, version, prev_block, merkle_root, timestamp, bits, nonce, tx_hashes = None):
+    def __init__(self, version, prev_block, merkle_root, timestamp, bits, nonce, tx_hashes = None, tx_count = None, tx = None):
         self.version = version
         self.prev_block = prev_block
         self.merkle_root = merkle_root
@@ -28,12 +29,14 @@ class Block:
         self.bits = bits
         self.nonce = nonce
         self.tx_hashes = tx_hashes
+        self.tx_count = tx_count
+        self.tx = tx
 
     def __repr__(self):
-        return '\nBlockhash: {}'.format(self.hash().hex())
+        return '\nBlockhash: {}'.format(self.hash().hex().zfill(64))
 
     @classmethod
-    def parse(cls, s):
+    def parse(cls, s, full_block = False):
         '''Takes a byte stream and parses a block. Returns a Block object'''
         version = little_endian_to_int(s.read(4))
         prev_block = s.read(32)[::-1]
@@ -41,8 +44,14 @@ class Block:
         timestamp = little_endian_to_int(s.read(4))
         bits = s.read(4)
         nonce = s.read(4)
-        return cls(version, prev_block, merkle_root, timestamp, bits, nonce)
 
+        if not full_block:
+            return cls(version, prev_block, merkle_root, timestamp, bits, nonce)
+
+        tx_count = read_varint(s)
+        tx = s.read(tx_count)
+        return cls(version, prev_block, merkle_root, timestamp, bits, nonce, tx_count, tx)
+        
     def serialize(self):
         '''Returns the 80 byte block header'''
         result = int_to_little_endian(self.version, 4)
