@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 
 import pymongo
-from pymongo import MongoClient
+from pymongo import MongoClient, ReturnDocument
 import random
 from network import *
 from tx import Tx
 from pprint import pformat
 import matplotlib.pyplot as plt
+import time
 
 GENESIS_HASH = '000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f'
 
@@ -19,6 +20,10 @@ class Database:
     def __repr__(self):
         '''using pretty print library here'''
         return pformat(list(self.collection.find()))
+
+    def sort(self):
+        '''returns block data sorted on height'''
+        return list(self.collection.find().sort('height'))
     
     def add(self, block):
         '''adds a block to the database'''
@@ -53,13 +58,20 @@ class Database:
 
     def height_update(self):
         '''Adds height to new blocks'''
-        while self.collection.find({'height': None}).count() > 0:
+        #this function could be more efficient, perhaps by using async
+        if self.collection.find({'height': None}).count() == 0:
+            print('all blocks have height')
+            return
+        start_block = self.latest_block()
 
-            start_block = self.latest_block()
+        while True:
             next_block_query = { 'prev_block': start_block['_id'] }
             new_height = {"$set": {'height': start_block['height'] + 1}}
-            self.collection.update_one(next_block_query, new_height)
-            print('New height:', start_block['height'])
+            start_block = self.collection.find_one_and_update(next_block_query, new_height, return_document=ReturnDocument.AFTER)
+            
+            if start_block == None: break
+            print('New height:', start_block['height'], end='\r')
+            
 
         
 
@@ -177,8 +189,9 @@ def get_block(n, files = 1):
     return blocks
 
 
-def plot(blocks):
-    counts = [b.difficulty() for b in blocks]
+def plot(blocks, attribute):
+    print('Plotting:', attribute)
+    counts = [b[attribute] for b in blocks]
     plt.plot(counts)
     plt.show()
       

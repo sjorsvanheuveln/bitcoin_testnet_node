@@ -11,25 +11,11 @@ from database import *
 
 
 '''fill db'''
-blocks = get_block(100)
+blocks = get_block(10000)
 db = Database('blocks')
-#db.drop()
+db.drop()
 db.add_multiple(blocks)
-
-#db = Database('blocks')
-
-#res = db.collection.find({'prev_block': db.latest_block()['_id']})
-#print(list(res))
 db.height_update()
-res = db.latest_block()
-print(res)
 
-
-
-#plot(blocks)
-
-
-
-
-
+#plot(db.sort(), 'difficulty')
 
