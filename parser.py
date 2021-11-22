@@ -8,21 +8,21 @@ SvH 18-11-2021
 
 ####################################
 from database import *
+import time
+from parse_examples import *
+from datetime import datetime
 
+''' examples '''
+#plot_difficulty()
 
 '''fill db'''
-blocks = get_block(100000, parse_tx_flag = False)
-db = Database('blocks')
-#db.drop()
+blocks = get_block(10, parse_tx_flag = True)
+db = Database('blocks', drop=False)
 db.add_multiple(blocks)
 db.update_block_heights()
-#plot(db.sort(), 'difficulty')
 
-
-
-
-
-
+r = db.collection.find_one({'height': 5})
+print(r)
 
 
 
@@ -33,12 +33,14 @@ db.update_block_heights()
 1. Try to retrieve transactions from DB
     - Store Transactions separately into new collections.
 2. Make a function that will correctly update the database to the latest block on my node.
-3. Timestamp to date?
-4. Improve update_height function.
-    - Perhaps search within a range. 
-    - Or exclude records with height
-    - Or calculate height before initial store to db!
+
 '''
 
 
+# start = time.time()
+# end = time.time()
+# print('Time:', end - start)
 
+#3. Timestamp to date?
+# res = db.collection.find_one({'height': 150000}, {'timestamp': 1})
+# print(datetime.utcfromtimestamp(res['timestamp']).strftime('%Y-%m-%d %H:%M:%S'))

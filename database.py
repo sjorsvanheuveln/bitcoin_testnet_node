@@ -15,17 +15,14 @@ PATH = '/Users/sjorsvanheuveln/Library/Application Support/Bitcoin/blocks/'
 
 class Database:
 
-    def __init__(self, collection_name):
+    def __init__(self, collection_name, drop=False):
         self.collection = MongoClient('mongodb://127.0.0.1:27017')['bittest'][collection_name]
-        self.collection.create_index([('prev_block', 1, ("height", 1) )]) #big performance improvement
+        if drop: self.drop() #removes collection including indexes
+        self.collection.create_index([('prev_block', 1)]) #12x performance improvement
 
     def __repr__(self):
         '''using pretty print library here'''
         return pformat(list(self.collection.find()))
-
-    def sort(self):
-        '''returns block data sorted on height'''
-        return list(self.collection.find().sort('height'))
     
     def add(self, block, i=''):
         '''adds a block to the database'''
@@ -68,7 +65,16 @@ class Database:
             
             if start_block == None: break
             print('New height:', start_block['height'], end='\r')
-            
+
+    def plot(self, attribute, interval, scale = 'linear'):
+        records = list(self.collection.find({'height':  interval}).sort('height'))
+        attr_list = [r[attribute] for r in records]
+        plt.plot(attr_list)
+        plt.title(attribute.title())
+        plt.xlabel('block height')
+        plt.yscale(scale)
+        plt.show()
+
 
 
 class Block:
@@ -132,6 +138,7 @@ class Block:
             "tx_count": self.tx_count,
             "difficulty": self.difficulty(),
             "timestamp": self.timestamp
+            "tx": self.tx
             }
 
     def id(self):
@@ -175,6 +182,14 @@ class Block:
 
         return True
 
+class Record:
+
+    def __init__(self):
+        print('yo')
+    #Or integrate into block. This should be possible.
+
+
+
 def get_block(n, parse_tx_flag = True):
     
     blocks = []
@@ -189,12 +204,9 @@ def get_block(n, parse_tx_flag = True):
             b = Block.parse(s, parse_tx_flag)
             blocks.append(b)
             if len(blocks) == n: return blocks
+
+    return blocks
     
 
-def plot(blocks, attribute):
-    print('Plotting:', attribute)
-    counts = [b[attribute] for b in blocks]
-    plt.plot(counts)
-    plt.show()
-      
-
+def create_interval(low, high):
+    return {'$gte': low, '$lte': high}
