@@ -17,6 +17,7 @@ class Database:
 
     def __init__(self, collection_name):
         self.collection = MongoClient('mongodb://127.0.0.1:27017')['bittest'][collection_name]
+        self.collection.create_index([('prev_block', 1, ("height", 1) )]) #big performance improvement
 
     def __repr__(self):
         '''using pretty print library here'''
@@ -38,8 +39,8 @@ class Database:
 
     def is_in_collection(self, blockhash):
         '''checks if block is already in db'''
-        result = self.collection.find({"_id": blockhash})
-        return False if result.count() == 0 else True
+        result = self.collection.find_one({"_id": blockhash})
+        return False if result == None else True
 
     def drop(self):
         '''removes the collection'''
@@ -129,7 +130,7 @@ class Block:
             "prev_block": self.prev_block.hex().zfill(64),
             "merkle_root": self.merkle_root.hex().zfill(64),
             "tx_count": self.tx_count,
-            "difficulty": self.difficulty()
+            "difficulty": self.difficulty(),
             "timestamp": self.timestamp
             }
 
