@@ -119,7 +119,9 @@ class Script:
                 cmds.append(op_code)
         if count != length:
             #removed error to let the script keep parsing
-            raise SyntaxError('parsing script failed')
+            print('Warning: Irregular Script')
+            s.seek(length-count, 1)
+            #raise SyntaxError('parsing script failed')
 
         return cls(cmds)
 

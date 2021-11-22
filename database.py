@@ -7,10 +7,11 @@ from network import *
 from tx import Tx
 from pprint import pformat
 import matplotlib.pyplot as plt
-import time
+import glob
+
 
 GENESIS_HASH = '000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f'
-
+PATH = '/Users/sjorsvanheuveln/Library/Application Support/Bitcoin/blocks/'
 
 class Database:
 
@@ -25,23 +26,20 @@ class Database:
         '''returns block data sorted on height'''
         return list(self.collection.find().sort('height'))
     
-    def add(self, block):
+    def add(self, block, i=''):
         '''adds a block to the database'''
-        # build a check whether current hash is in db already
         if not self.is_in_collection(block.id()):
-            print('Adding:', block.id(), end='\r')
+            print('Adding: {}:'.format(str(i).zfill(6)), block.id(), end='\r')
             self.collection.insert_one(block.mongodb_object())
+
+    def add_multiple(self, blocks):
+        for i, block in enumerate(blocks):
+            self.add(block, i)
 
     def is_in_collection(self, blockhash):
         '''checks if block is already in db'''
         result = self.collection.find({"_id": blockhash})
-        if result.count() == 0:
-            return False
-        return True
-
-    def add_multiple(self, blocks):
-        for block in blocks:
-            self.add(block)
+        return False if result.count() == 0 else True
 
     def drop(self):
         '''removes the collection'''
@@ -60,6 +58,7 @@ class Database:
         '''Adds height to new blocks'''
         #perhaps can still improve by retrieve all at once update all and then update database
         start_block = self.latest_block()
+        print('\n')
 
         while True:
             next_block_query = { 'prev_block': start_block['_id'] }
@@ -128,9 +127,10 @@ class Block:
             "_id": self.id(),
             "height": 0 if self.id() == GENESIS_HASH else None,
             "prev_block": self.prev_block.hex().zfill(64),
-            "merkle_root": self.prev_block.hex().zfill(64),
+            "merkle_root": self.merkle_root.hex().zfill(64),
             "tx_count": self.tx_count,
             "difficulty": self.difficulty()
+            "timestamp": self.timestamp
             }
 
     def id(self):
@@ -174,21 +174,21 @@ class Block:
 
         return True
 
-def get_block(n, files = 1, parse_tx_flag = True):
-    path = '/Users/sjorsvanheuveln/Library/Application Support/Bitcoin/blocks/'
+def get_block(n, parse_tx_flag = True):
+    
     blocks = []
+    files = sorted(glob.glob(PATH + 'blk*.dat'))
 
-    for i in range(0, files):
-        print('blk', i)
-        s = open(path + "blk" + str(i).zfill(5) + ".dat", "rb")
+    for file in files:
+
+        print('Parsing', file, '\n', end='\r')
+        s = open(file, 'rb')
 
         while s.peek(1) != b'':
             b = Block.parse(s, parse_tx_flag)
             blocks.append(b)
-            if len(blocks) == n: break
-
-    return blocks
-
+            if len(blocks) == n: return blocks
+    
 
 def plot(blocks, attribute):
     print('Plotting:', attribute)
